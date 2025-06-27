@@ -18,5 +18,5 @@ target_sources(<Module_Name> PUBLIC
   )
 
 if (MSVC)
-  target_compile_definitions(<Module_Name> PRIVATE <Project_Name>_BUILD_DLL)
+  target_compile_definitions(<Module_Name> PRIVATE <PROJECT_NAME>_BUILD_DLL)
 endif()
