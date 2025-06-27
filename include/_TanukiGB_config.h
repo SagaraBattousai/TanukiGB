@@ -1,5 +1,5 @@
-#ifndef __PROJECT_NAME_CONFIG_H__
-#define __PROJECT_NAME_CONFIG_H__
+#ifndef __TANUKIGB_CONFIG_H__
+#define __TANUKIGB_CONFIG_H__
 
 //May be able to remove this constexpr shizz
 //I think this version supports all the c++20 features I like
@@ -36,12 +36,12 @@
 //Make it harder to mistakenly type export when you don't mean to.
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-#ifdef PROJECT_NAME_BUILD_DLL
-#define PROJECT_NAME_EXPORT __declspec(dllexport)
+#ifdef TANUKIGB_BUILD_DLL
+#define TANUKIGB_EXPORT __declspec(dllexport)
 #else
-#define PROJECT_NAME_EXPORT __declspec(dllimport) 
+#define TANUKIGB_EXPORT __declspec(dllimport) 
 #endif
-#define PROJECT_NAME_LOCAL
+#define TANUKIGB_LOCAL
 #else
 #ifndef __has_attribute
 #define __has_attribute(x) 0  // Compatibility with non-clang compilers.
@@ -50,11 +50,11 @@
 #if (defined(__GNUC__) && (__GNUC__ >= 4)) ||\
       (defined(__clang__) && __has_attribute(visibility))
 
-#define PROJECT_NAME_EXPORT __attribute__ ((visibility ("default")))
-#define PROJECT_NAME_LOCAL  __attribute__ ((visibility ("hidden")))
+#define TANUKIGB_EXPORT __attribute__ ((visibility ("default")))
+#define TANUKIGB_LOCAL  __attribute__ ((visibility ("hidden")))
 #else
-#define PROJECT_NAME_EXPORT
-#define PROJECT_NAME_LOCAL
+#define TANUKIGB_EXPORT
+#define TANUKIGB_LOCAL
 #endif
 #endif
 

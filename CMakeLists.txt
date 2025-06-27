@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.29)
 
 project(
-  <Project_Name>
-  VERSION <x.y.z>
+  TanukiGB
+  VERSION 0.0.1
   DESCRIPTION ""
   LANGUAGES C CXX)
 
 # Leave C++ standard up to the root application, so set it only if this is the
 # current top-level CMake project.
-if(CMAKE_SOURCE_DIR STREQUAL <Project_Name>_SOURCE_DIR)
+if(CMAKE_SOURCE_DIR STREQUAL TanukiGB_SOURCE_DIR)
   set(CMAKE_CXX_STANDARD 20)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
   set(CMAKE_C_STANDARD 11)
@@ -17,12 +17,12 @@ else()
   if(CMAKE_CXX_STANDARD LESS 20)
     message(
       FATAL_ERROR
-        "thoth requires CMAKE_CXX_STANDARD >= 20 (got: ${CMAKE_CXX_STANDARD})")
+        "TanukiGB requires CMAKE_CXX_STANDARD >= 20 (got: ${CMAKE_CXX_STANDARD})")
   endif()
   if(CMAKE_C_STANDARD LESS 11)
     message(
       FATAL_ERROR
-        "thoth requires CMAKE_C_STANDARD >= 11 (got: ${CMAKE_C_STANDARD})")
+        "TanukiGB requires CMAKE_C_STANDARD >= 11 (got: ${CMAKE_C_STANDARD})")
   endif()
 endif()
 
@@ -35,8 +35,6 @@ include(LibUtils)
 include(PropertyUtils)
 include(DocsUtils)
 
-set_system_check_vars()
-
 if(MSVC)
   # Wall removed as msvc has some errors that trigger this
   add_compile_options(/permissive- /WX /W4) # Wall)
@@ -45,25 +43,26 @@ else()
   add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
-set(<Project_Name>_BUILD_DOCS
+set(TanukiGB_BUILD_DOCS
     ON
     CACHE BOOL "Whether or not to build documentation.")
-  set(<Project_Name>_BUILD_TESTS
+  set(TanukiGB_BUILD_TESTS
     ON
     CACHE BOOL "Whether or not to build tests.")
 
 
 set(MODULE_ROOT "${PROJECT_SOURCE_DIR}/include")
 
-add_subdirectory(<Project_Name>)
+add_subdirectory(app)
+add_subdirectory(TanukiGB)
 
 
-if(<Project_Name>_BUILD_TESTS)
+if(TanukiGB_BUILD_TESTS)
   # enable_testing() 
   # add_subdirectory(tests)
 endif()
 
-if(<Project_Name>_BUILD_DOCS)
+if(TanukiGB_BUILD_DOCS)
   add_subdirectory(docs)
 endif()
 

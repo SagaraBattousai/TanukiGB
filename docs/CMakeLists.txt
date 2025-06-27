@@ -14,10 +14,10 @@ set(SPHINX_CSS "css/style.css" "css/colours.css" "css/defaults.css"
 set(SPHINX_RESTRUCTRED_TEXT
     # Root Index
     "${SPHINX_ROOT_DIRECTORY}/index.rst"
-    "${SPHINX_ROOT_DIRECTORY}/<Project_Name>/<Module_Name>/index.rst")
+    "${SPHINX_ROOT_DIRECTORY}/TanukiGB/memory/index.rst")
 
 add_doxygen_docs(
-  Doxygen_<Project_Name>
+  Doxygen_TanukiGB
   DOXYFILE_IN
   "${DOXYFILE_ROOT_DIRECTORY}/Doxyfile.in"
   DOXYFILE_OUT
@@ -26,10 +26,10 @@ add_doxygen_docs(
   GENERATE_MAN
   JAVADOC_BANNER
   TARGETS
-  <TARGET_LIST>)
+  cpu memory)
 
 add_sphinx_docs(
-  Sphinx_<Project_Name>
+  Sphinx_TanukiGB
   CONF_IN
   "${SPHINX_ROOT_DIRECTORY}/conf.py.in"
   CONF_OUT
@@ -40,7 +40,7 @@ add_sphinx_docs(
   ${SPHINX_CSS}
   BREATHE_DOMAIN_ALL_CPP)
 
-add_dependencies(Sphinx_<Project_Name> Doxygen_<Project_Name>)
+add_dependencies(Sphinx_TanukiGB Doxygen_TanukiGB)
 
-set_target_properties(Doxygen_<Project_Name> Sphinx_<Project_Name> PROPERTIES FOLDER Docs
+set_target_properties(Doxygen_TanukiGB Sphinx_TanukiGB PROPERTIES FOLDER Docs
                                                             EXCLUDE_FROM_ALL ON)
