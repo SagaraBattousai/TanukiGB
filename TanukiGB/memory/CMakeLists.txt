@@ -1,16 +1,12 @@
 
 set(memory_MODULE_ROOT "${MODULE_ROOT}/TanukiGB/memory")
-# set(internal_memory_MODULE_ROOT "${MODULE_ROOT}/TanukiGB/internal/memory")
 
 set(cpp_sources "memory.cpp" "bootrom.cpp")
 set(c_sources "")
 set(memory_module 
   "${memory_MODULE_ROOT}/bootrom.h"
-  "${memory_MODULE_ROOT}/memory.h" # Could move to internal but....
+  "${memory_MODULE_ROOT}/memory.h" # Cant be internal
   )
-# set(internal_memory_module
-#   "${internal_memory_MODULE_ROOT}/memory.h"
-#   )
 
 add_library(memory SHARED ${cpp_sources} ${c_sources})
 
@@ -22,12 +18,7 @@ target_sources(memory PUBLIC
   "${MODULE_ROOT}/_TanukiGB_config.h"
   )
 
-# target_sources(memory PRIVATE
-#   FILE_SET private_headers
-#   TYPE HEADERS
-#   BASE_DIRS ${MODULE_ROOT}
-#   FILES ${internal_memory_module}
-#   )
+target_link_libraries(memory types)
 
 if (MSVC)
   target_compile_definitions(memory PRIVATE TANUKIGB_BUILD_DLL)
