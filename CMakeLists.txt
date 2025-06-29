@@ -6,6 +6,10 @@ project(
   DESCRIPTION ""
   LANGUAGES C CXX)
 
+# TODO: Setup as a macro ...
+#
+# Also note that since this is unlikly to be used as a library ....
+#
 # Leave C++ standard up to the root application, so set it only if this is the
 # current top-level CMake project.
 if(CMAKE_SOURCE_DIR STREQUAL TanukiGB_SOURCE_DIR)
@@ -37,7 +41,7 @@ include(DocsUtils)
 
 if(MSVC)
   # Wall removed as msvc has some errors that trigger this
-  add_compile_options(/permissive- /WX /W4) # Wall)
+  add_compile_options(/permissive- /W4) # /WX) # Wall)
   # set(VS_STARTUP_PROJECT "")
 else()
   add_compile_options(-Wall -Wextra -pedantic -Werror)
@@ -74,17 +78,29 @@ endif()
 # Install settings
 # ----------------------------------------------
 
-# include(GNUInstallDirs)
+include(GNUInstallDirs)
 
-# set(IN_BUILD_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}")
+# While we could get all shared/static libs from the main exe its probably
+# best to specify separatly. Though maybe we can check what kind of lib?
 
-# set(INSTALL_IN_BUILD OFF CACHE BOOL "If set, the CMAKE_INSTALL_PREFIX will be
-# set to the build directory\ (unless CMAKE_INSTALL_PREFIX has been set by the
-# user).\nIn this case\ CMAKE_INSTALL_PREFIX = ${IN_BUILD_INSTALL_PREFIX}")
+set(STATIC_LIBRARIES "")
+set(SHARED_LIBRARIES "memory" "cpu")
+set(HEADER_ONLY_LIBRARIES "types")
 
-# if(INSTALL_IN_BUILD AND NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-# set(CMAKE_INSTALL_PREFIX "${IN_BUILD_INSTALL_PREFIX}" CACHE PATH "..." FORCE)
-# endif()
+# foreach(shared_lib ${SHARED_LIBRARIES})
+#   message(STATUS "shared_lib = ${shared_lib}")
+#   get_target_property(headers ${shared_lib} HEADER_SET)
+#   message(STATUS "header sets = ${headers}") 
+# endforeach()
+
+install(TARGETS memory DESTINATION ${CMAKE_INSTALL_BINDIR}
+  FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(TARGETS app DESTINATION ${CMAKE_INSTALL_BINDIR}
+  FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(TARGETS cpu DESTINATION ${CMAKE_INSTALL_BINDIR}
+  FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # install(TARGETS <Target_Name> RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 # LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION

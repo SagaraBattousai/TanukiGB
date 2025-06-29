@@ -3,6 +3,8 @@
 
 #include <_TanukiGB_config.h>
 
+#include <vector>
+
 #include <tanukigb/types/types.h>
 #include <tanukigb/memory/memory.h>
 
@@ -12,9 +14,16 @@ class TANUKIGB_EXPORT Bootrom : public Memory<Bootrom> {
 
   public:
 
-  Bootrom() = default;
+    static Bootrom GBRom() { return Bootrom("dmg.bootrom"); }
 
-  byte_t Read_Impl(word_t addr) const;
+  byte_t Read(word_t addr) const;
+
+  private:
+
+    Bootrom(const char* bootrom_filename);
+
+    std::vector<byte_t> rom_;
+
 };
 
 

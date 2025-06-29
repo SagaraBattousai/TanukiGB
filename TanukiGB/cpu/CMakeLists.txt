@@ -4,7 +4,7 @@ set(cpu_MODULE_ROOT "${MODULE_ROOT}/TanukiGB/cpu")
 set(cpp_sources "cpu.cpp")
 set(c_sources "")
 set(cpu_module
-  #"${cpu_MODULE_ROOT}/xyz.h"
+  "${cpu_MODULE_ROOT}/cpu.h"
   )
 
 add_library(cpu SHARED ${cpp_sources} ${c_sources})
