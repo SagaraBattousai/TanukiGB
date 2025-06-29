@@ -23,13 +23,3 @@ target_link_libraries(memory types)
 if (MSVC)
   target_compile_definitions(memory PRIVATE TANUKIGB_BUILD_DLL)
 endif()
-
-
-
-# message(STATUS "$<INSTALL_INTERFACE:memory>")
-# message(STATUS "$<BUILD_INTERFACE:memory>")
-# message(STATUS "$<BUILD_LOCAL_INTERFACE:memory>")
-
-get_target_property(MID memory INCLUDE_DIRECTORIES)
-
-message(STATUS "MID = ${MID}")

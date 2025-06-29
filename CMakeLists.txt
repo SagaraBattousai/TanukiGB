@@ -47,13 +47,9 @@ else()
   add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
-set(TanukiGB_BUILD_DOCS
-    ON
-    CACHE BOOL "Whether or not to build documentation.")
-  set(TanukiGB_BUILD_TESTS
-    ON
-    CACHE BOOL "Whether or not to build tests.")
+set(TanukiGB_BUILD_DOCS OFF CACHE BOOL "Whether or not to build documentation.")
 
+set(TanukiGB_BUILD_TESTS OFF CACHE BOOL "Whether or not to build tests.")
 
 set(MODULE_ROOT "${PROJECT_SOURCE_DIR}/include")
 
@@ -62,8 +58,8 @@ add_subdirectory(TanukiGB)
 
 
 if(TanukiGB_BUILD_TESTS)
-  # enable_testing() 
-  # add_subdirectory(tests)
+  enable_testing() 
+  add_subdirectory(tests)
 endif()
 
 if(TanukiGB_BUILD_DOCS)
@@ -80,39 +76,30 @@ endif()
 
 include(GNUInstallDirs)
 
-# While we could get all shared/static libs from the main exe its probably
-# best to specify separatly. Though maybe we can check what kind of lib?
+# For now we'll use LINK_LIBRARIES as LINK_INTERFACE_LIBRARIES doesn't include the
+# public libraries for some reason, or maybe it's obvious.
 
-set(STATIC_LIBRARIES "")
-set(SHARED_LIBRARIES "memory" "cpu")
-set(HEADER_ONLY_LIBRARIES "types")
+set(APP_TARGET "app")
+get_target_property(APP_LIBRARIES ${APP_TARGET} LINK_LIBRARIES)
+# get_target_property(APP_LIBRARIES ${APP_TARGET} LINK_INTERFACE_LIBRARIES)
 
-# foreach(shared_lib ${SHARED_LIBRARIES})
-#   message(STATUS "shared_lib = ${shared_lib}")
-#   get_target_property(headers ${shared_lib} HEADER_SET)
-#   message(STATUS "header sets = ${headers}") 
-# endforeach()
+install(TARGETS app DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-install(TARGETS memory DESTINATION ${CMAKE_INSTALL_BINDIR}
-  FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+foreach(library ${APP_LIBRARIES})
+  install(TARGETS ${library}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+endforeach()
 
-install(TARGETS app DESTINATION ${CMAKE_INSTALL_BINDIR}
-  FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+#install(IMPORTED_RUNTIME_ARTIFACTS OpenSSL::Crypto 
+# RUNTIME_DEPENDENCY_SET external_runtime_deps RUNTIME)
 
-install(TARGETS cpu DESTINATION ${CMAKE_INSTALL_BINDIR}
-  FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+if(BUILD_DOCS) #Use trailing slashes to avoid adding subdirectories
+  install(DIRECTORY "${TanukiGB_SOURCE_DIR}/docs/docs_build/sphinx/"
+    DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
-# install(TARGETS <Target_Name> RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-# LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION
-# ${CMAKE_INSTALL_LIBDIR})
-
-# install(TARGETS cactuar FILE_SET public_headers DESTINATION
-# ${CMAKE_INSTALL_INCLUDEDIR}) install(IMPORTED_RUNTIME_ARTIFACTS
-# OpenSSL::Crypto RUNTIME_DEPENDENCY_SET external_runtime_deps RUNTIME)
-
-# if(BUILD_DOCS) #Use trailing slashes to avoid adding subdirectories
-# install(DIRECTORY "${CMAKE_SOURCE_DIR}/docs/build/sphinx/" DESTINATION
-# ${CMAKE_INSTALL_DOCDIR})
-
-# install(DIRECTORY "${CMAKE_SOURCE_DIR}/docs/build/man/" DESTINATION
-# ${CMAKE_INSTALL_MANDIR}) endif()
+  install(DIRECTORY "${TanukiGB_SOURCE_DIR}/docs/docs_build/man/"
+    DESTINATION ${CMAKE_INSTALL_MANDIR})
+endif()
