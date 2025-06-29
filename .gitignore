@@ -1,3 +1,7 @@
+# For now we wont add the xml doxygen stuff as I cannot remember if 
+# we need it for read the docs
+docs/docs_build/xml/*
+
 # Boot Bins
 *.bootrom
 
