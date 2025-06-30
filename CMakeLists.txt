@@ -36,6 +36,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 include(SystemCheck)
 include(LibUtils)
+include(ResourceUtils)
 include(PropertyUtils)
 include(DocsUtils)
 
@@ -51,7 +52,9 @@ set(TanukiGB_BUILD_DOCS OFF CACHE BOOL "Whether or not to build documentation.")
 
 set(TanukiGB_BUILD_TESTS OFF CACHE BOOL "Whether or not to build tests.")
 
-set(MODULE_ROOT "${PROJECT_SOURCE_DIR}/include")
+set(MODULE_ROOT "${TanukiGB_SOURCE_DIR}/include")
+
+set(BOOTROMS_SOURCE_DIR "${TanukiGB_SOURCE_DIR}/bootroms")
 
 add_subdirectory(app)
 add_subdirectory(TanukiGB)

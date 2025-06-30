@@ -13,16 +13,17 @@ namespace tanukigb {
 class TANUKIGB_EXPORT Bootrom : public Memory<Bootrom> {
 
   public:
-
-    static Bootrom GBRom() { return Bootrom("dmg.bootrom"); }
+   static Bootrom GBRom();
+   static Bootrom CGBRom();
 
   byte_t Read(word_t addr) const;
 
   private:
+   //Bootrom(const char* bootrom_filename);
+   Bootrom(std::vector<byte_t> rom);
 
-    Bootrom(const char* bootrom_filename);
-
-    std::vector<byte_t> rom_;
+   // May change to shared_ptr array as it's "fixed size" but it seems a bit...more work
+    const std::vector<byte_t> rom_;
 
 };
 
