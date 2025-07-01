@@ -1,7 +1,7 @@
 
 set(cpu_MODULE_ROOT "${MODULE_ROOT}/TanukiGB/cpu")
 
-set(cpp_sources "cpu.cpp")
+set(cpp_sources "cpu.cpp" "register.cpp")
 set(c_sources "")
 set(cpu_module
   "${cpu_MODULE_ROOT}/cpu.h"
@@ -18,5 +18,5 @@ target_sources(cpu PUBLIC
   )
 
 if (MSVC)
-  target_compile_definitions(cpu PRIVATE TanukiGB_BUILD_DLL)
+  target_compile_definitions(cpu PRIVATE TANUKIGB_BUILD_DLL)
 endif()
