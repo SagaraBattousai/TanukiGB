@@ -2,19 +2,27 @@
 
 #include <tanukigb/memory/bootrom.h>
 #include <tanukigb/cpu/cpu.h>
+#include <tanukigb/cpu/register_set.h>
 
 #include <cstdint>
-#include <tuple>
 
 int main() {
 
-  std::tuple<double, char> tup(1.618, 0xAB);
+  tanukigb::RegisterSet rs;
 
-  char t2 = std::get<1>(tup);
+  rs.DumpRegisters(std::cout);
 
-  tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
+  rs.PrettyDumpRegisters(std::cout);
 
-  cpu.DumpRegisters(std::cout);  
+  rs.Get(tanukigb::RegisterSet::Register8Bit::A) = 0xFF;
+
+  rs.Get(tanukigb::RegisterSet::Register16Bit::BC) = 0xDEAD;
+
+  rs.Get(tanukigb::RegisterSet::Register16Bit::PC)++;
+
+  rs.DumpRegisters(std::cout);
+
+  rs.PrettyDumpRegisters(std::cout);
 
   return 0; 
 

@@ -5,7 +5,7 @@
 
 namespace tanukigb {
 
-Cpu::Cpu(Bootrom&& bootrom) : bootrom_(std::move(bootrom)), register_map_() {}
+Cpu::Cpu(Bootrom&& bootrom) : bootrom_(std::move(bootrom)){}//, register_map_() {}
 
 void Cpu::Run() { 
   //byte_t opcode = bootrom_[this->PC()]; 
