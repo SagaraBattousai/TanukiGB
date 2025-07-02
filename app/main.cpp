@@ -4,19 +4,17 @@
 #include <tanukigb/cpu/cpu.h>
 
 #include <cstdint>
-
+#include <tuple>
 
 int main() {
 
-  auto cpu = tanukigb::Cpu();
+  std::tuple<double, char> tup(1.618, 0xAB);
 
-  cpu.DumpRegisters(std::cout);
+  char t2 = std::get<1>(tup);
 
-  cpu.A(0xFF);
+  tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
 
-  cpu.BC(0x1234);
-
-  cpu.DumpRegisters(std::cout);
+  cpu.DumpRegisters(std::cout);  
 
   return 0; 
 

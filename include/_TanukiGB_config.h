@@ -36,6 +36,10 @@
 //Make it harder to mistakenly type export when you don't mean to.
 
 #if defined(_WIN32) || defined(__CYGWIN__)
+// Now here is an interesting question....
+// See dllexport will be on headers that are used by "other dll's" even though
+//   the definition will be only in the "true" dll.
+// It doesn't seem to be an issue but one would think that all other dll's should use dllimport
 #ifdef TANUKIGB_BUILD_DLL
 #define TANUKIGB_EXPORT __declspec(dllexport)
 #else

@@ -1,18 +1,21 @@
 #ifndef __TANUKIGB_MEMORY_MEMORY_H__
 #define __TANUKIGB_MEMORY_MEMORY_H__
 
-#include <_TanukiGB_config.h>
 #include <tanukigb/types/types.h>
 
 namespace tanukigb {
 
 template <typename ConcreteMemory>
-class TANUKIGB_LOCAL Memory {  // unexported but cant be an internal header so
+class Memory {  // Cant be an internal header but msvc complaining about no export but....
 
  public:
    Memory() = default;
 
-   const byte_t& operator[](word_t addr) const {
+   /*const byte_t& operator[](word_t addr) const {
+     return this->underlying().Read(addr);
+   }*/
+
+   byte_t operator[](word_t addr) const {
      return this->underlying().Read(addr);
    }
 
