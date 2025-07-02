@@ -5,12 +5,23 @@
 
 namespace tanukigb {
 
-Cpu::Cpu(Bootrom&& bootrom) : bootrom_(std::move(bootrom)){}//, register_map_() {}
+Cpu::Cpu(Bootrom&& bootrom) : bootrom_(std::move(bootrom)), register_set_() {}
 
 void Cpu::Run() { 
-  //byte_t opcode = bootrom_[this->PC()]; 
-  //this->PC(this->PC() + 1);
-  //Yeah this register interface needs work, its a bit rubbish at the moment
+  byte_t opcode = bootrom_[this->register_set_.Get(RegisterSet::Register16Bit::PC)]; 
+  this->register_set_.Get(RegisterSet::Register16Bit::PC)++;
+
+  if (opcode == 0x31) {
+    this->register_set_.Get(RegisterSet::Register16Bit::SP) =
+        (word_t)(bootrom_[this->register_set_.Get(
+                     RegisterSet::Register16Bit::PC)] |
+                 (word_t)(bootrom_[this->register_set_.Get(
+                     RegisterSet::Register16Bit::PC) + 1]) << 8);
+    this->register_set_.Get(RegisterSet::Register16Bit::PC) += 2;
+  }
+
+  return;
+
 }
 
 /*

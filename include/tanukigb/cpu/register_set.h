@@ -11,6 +11,10 @@
 
 namespace tanukigb {
 
+// NOTE: Turns out the endianness is not an issue (at least I think, maybe there is some issue when reading as a smaller type
+//   that said the interface is still crappy so..... Lets go back to each register being its own class??
+// tbf a tuple could do nicely ...
+
 
 // Before I start I should mention that I don't fully understand std::align from memory and I cant
 // get it working in tests so we're just going to be smart and use the fact that: 

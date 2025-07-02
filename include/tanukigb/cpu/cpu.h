@@ -8,7 +8,7 @@
 
 #include <tanukigb/types/types.h>
 #include <tanukigb/memory/bootrom.h>
-//#include <tanukigb/cpu/register_set.h>
+#include <tanukigb/cpu/register_set.h>
 
 namespace tanukigb {
 class TANUKIGB_EXPORT Cpu {
@@ -21,9 +21,13 @@ class TANUKIGB_EXPORT Cpu {
 
   void Run();
 
-  //std::ostream& DumpRegisters(std::ostream& os) const {
-  //  return register_map_.DumpRegisters(os);
-  //}
+  std::ostream& PrettyDumpRegisters(std::ostream& os) const {
+    return register_set_.PrettyDumpRegisters(os);
+  }
+
+  std::ostream& DumpRegisters(std::ostream& os) const {
+    return register_set_.DumpRegisters(os);
+  }
 
  private:
 
@@ -36,7 +40,7 @@ class TANUKIGB_EXPORT Cpu {
   //void Write16BitRegister(int memory_offset, word_t value);
 
   Bootrom bootrom_;
-  //CpuRegisterMap register_map_;
+  RegisterSet register_set_;
 };
 
 
