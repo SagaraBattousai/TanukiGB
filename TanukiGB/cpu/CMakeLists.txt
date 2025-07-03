@@ -3,12 +3,14 @@ set(cpu_MODULE_ROOT "${MODULE_ROOT}/TanukiGB/cpu")
 
 set(cpp_sources 
   "cpu.cpp" 
+  "cpu_register.cpp"
   "register_set.cpp"
   )
 
 set(c_sources "")
 set(cpu_module
   "${cpu_MODULE_ROOT}/cpu.h"
+  "${cpu_MODULE_ROOT}/cpu_register.h"
   "${cpu_MODULE_ROOT}/register_set.h"
   )
 

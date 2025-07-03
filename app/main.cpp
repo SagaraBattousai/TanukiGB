@@ -3,22 +3,29 @@
 #include <tanukigb/memory/bootrom.h>
 #include <tanukigb/cpu/cpu.h>
 #include <tanukigb/cpu/register_set.h>
+#include <tanukigb/cpu/cpu_register.h>
 
 #include <cstdint>
 
 int main() {
 
-  auto cpu = tanukigb::Cpu::GameboyCpu();
+  tanukigb::CpuRegister<std::uint8_t> reg;
 
-  cpu.DumpRegisters(std::cout);
+  reg = 0xAB;
 
-  cpu.PrettyDumpRegisters(std::cout);
+  reg -= 0x01;
 
-  cpu.Run();
+  std::cout << "Sum reg and 0xBE:\n";   
 
-  cpu.DumpRegisters(std::cout);
+  std::uint8_t a = reg + 0xBE;
 
-  cpu.PrettyDumpRegisters(std::cout);
+  std::cout << "\n\nSum 0xEF and reg:\n";   
+
+  std::uint8_t b = 0xEF + reg;
+
+  std::cout << std::hex << "\n\na = 0x" << +a << "\tb = 0x" << +b << std::endl;   
+
+
 
   return 0; 
 

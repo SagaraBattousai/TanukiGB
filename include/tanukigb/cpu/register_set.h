@@ -32,40 +32,34 @@ namespace tanukigb {
 //template <typename T>
 class TANUKIGB_EXPORT RegisterSet {
  public:
-   // Offsets as value would be better but would reveal underlying ... stuff
-   // Although now I think about it it is indeed the offsets so :D
-   //
-   // Note: Unscoped enums have the implementation define the integral type which is really
-   // nice, probably smarter than myself as each implementation can pick the best and
-   // avoids a cast :D
-   // Although is std::int_fast8_t a smart alternative for a scoped enum. Actually thats
-   //   what well do as we dont want anyone to pass in an integral type and get an implicit cast
-   //
-  enum class Register8Bit : std::int_fast8_t {A = 0, F = 1, B = 2, C = 3, D = 4, E = 5, H = 6, L = 7 };
-  enum class Register16Bit : std::int_fast8_t {AF = 0, BC = 1, DE = 2, HL = 3, SP = 4, PC = 5};
+  enum Register8Bit : std::int_fast8_t {A = 0, F = 1, B = 2, C = 3, D = 4, E = 5, H = 6, L = 7 };
+  enum Register16Bit : std::int_fast8_t {AF = 0, BC = 1, DE = 2, HL = 3, SP = 4, PC = 5};
 
  private:
-   using buffer_type = std::uint_fast32_t;
+   using buffer_type = byte_t; //std::uint_fast32_t;
   // I'm not sure that this is acceptable but hopefully it won't instansiate the template
    using array_size_type = std::array<buffer_type, 0>::size_type;
-   static constexpr array_size_type kRawRegisterByteSize = 12;
-   // Thing is it's ceil(kRawRegisterByteSize / sizeof(uint_fast32_t)) which is iffy for constexpr
-   static constexpr array_size_type kRawRegisterBufferSize = 3;
+   static constexpr array_size_type kRawRegisterBufferSize = 12;
+
  public:
 
   RegisterSet();
-
-  // I'd love to write something clever like tuple/array's get<int>() but ....
-  // Const versions returning scalar type should return by value (apparently though it makes sence
-  // That said I will therefore have to write two different versions doing the same thing although
-  //   actually it is quite different with the reinterpet casting, very cool!
-  byte_t Get(Register8Bit register_name) const;
 
   //The reference versions are a bit dangerous as if this class dies then .....
   // Maybe I'm trying to be far too "cleaver" and should just have "loose" variables.
   // However, this way I can leave out a tonne of repetitive code / switch statements.
 
-  byte_t& Get(Register8Bit register_name);
+  byte_t Get(Register8Bit register_name) const {
+    return raw_register_buffer_[register_name];
+  }
+  byte_t& Get(Register8Bit register_name) {
+    return raw_register_buffer_[register_name];
+  }
+
+  // Due to the fact that different systems have different endianness this is a bit trickier
+  // The reference is iffy because it wont actually belong to a value.
+  //Therefore lets write a proper class.
+
   word_t Get(Register16Bit register_name) const;
   word_t& Get(Register16Bit register_name);
 

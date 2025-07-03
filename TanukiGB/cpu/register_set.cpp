@@ -9,17 +9,6 @@ RegisterSet::RegisterSet() : raw_register_buffer_() {
   raw_register_buffer_.fill(0x00);
 }
 
-byte_t RegisterSet::Get(Register8Bit register_name) const {
-  const byte_t* ptr =
-      reinterpret_cast<const byte_t*>(this->raw_register_buffer_.data());
-  return ptr[static_cast<std::underlying_type_t<Register8Bit>>(register_name)];
-}
-
-byte_t& RegisterSet::Get(Register8Bit register_name) {
-  byte_t* ptr =
-      reinterpret_cast<byte_t*>(this->raw_register_buffer_.data());
-  return ptr[static_cast<std::underlying_type_t<Register8Bit>>(register_name)];
-}
 word_t RegisterSet::Get(Register16Bit register_name) const {
   const word_t* ptr =
       reinterpret_cast<const word_t*>(this->raw_register_buffer_.data());
@@ -65,7 +54,7 @@ std::ostream& RegisterSet::DumpRegisters(std::ostream& os) const {
   const unsigned char* mem_ptr =
       reinterpret_cast<const unsigned char*>(this->raw_register_buffer_.data());
 
-  for (int i = 0; i < RegisterSet::kRawRegisterByteSize; ++i) {
+  for (int i = 0; i < RegisterSet::kRawRegisterBufferSize; ++i) {
     unsigned char byte = mem_ptr[i];
     if (byte < 0x10) {
       os << 0U;
