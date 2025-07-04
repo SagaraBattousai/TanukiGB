@@ -5,23 +5,33 @@
 
 namespace tanukigb {
 
-Cpu::Cpu(Bootrom&& bootrom) : bootrom_(std::move(bootrom)), register_set_() {}
+Cpu::Cpu(Bootrom&& bootrom) : bootrom_(std::move(bootrom)) {}
 
-void Cpu::Run() { 
-  byte_t opcode = bootrom_[this->register_set_.Get(RegisterSet::Register16Bit::PC)]; 
-  this->register_set_.Get(RegisterSet::Register16Bit::PC)++;
+int Cpu::Run() {
+  while (true) {
+    byte_t opcode = bootrom_[static_cast<word_t>(PC_)];
+    PC_++;
 
-  if (opcode == 0x31) {
-    this->register_set_.Get(RegisterSet::Register16Bit::SP) =
-        (word_t)(bootrom_[this->register_set_.Get(
-                     RegisterSet::Register16Bit::PC)] |
-                 (word_t)(bootrom_[this->register_set_.Get(
-                     RegisterSet::Register16Bit::PC) + 1]) << 8);
-    this->register_set_.Get(RegisterSet::Register16Bit::PC) += 2;
+    switch (opcode) {
+      case 0x31:
+        SP_ = bootrom_[static_cast<word_t>(PC_)] |
+              static_cast<word_t>(bootrom_[static_cast<word_t>(PC_) + 1]) << 8;
+        PC_ += 2;
+        break;
+      default:
+        return opcode;
+    }
   }
 
-  return;
+  return 0;
+}
 
+std::ostream& Cpu::DumpRegisters(std::ostream& os) const {
+  os << "A: " << A_ << "\tF: " << F_ << "\nB: " << B_ << "\tC: " << C_
+     << "\nD: " << D_ << "\tE: " << E_ << "\nH: " << H_ << "\tL: " << L_
+     << "\nSP: " << SP_ << "\nPC: " << PC_ << std::endl;
+
+  return os;
 }
 
 /*
