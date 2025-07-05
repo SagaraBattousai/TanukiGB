@@ -1,71 +1,83 @@
 
-#include <type_traits>
-
 #include <tanukigb/cpu/register_set.h>
 
+#include <format>
+#include <type_traits>
+
 namespace tanukigb {
+
+namespace {
+template <typename E>  // requires scoped enum if we upgrade to C++ 23
+constexpr auto toUnderlying(E enumurator) noexcept {
+  return static_cast<std::underlying_type_t<E>>(enumurator);
+}
+}  // namespace
 
 RegisterSet::RegisterSet() : raw_register_buffer_() {
   raw_register_buffer_.fill(0x00);
 }
 
-word_t RegisterSet::Get(Register16Bit register_name) const {
-  const word_t* ptr =
-      reinterpret_cast<const word_t*>(this->raw_register_buffer_.data());
-  return ptr[static_cast<std::underlying_type_t<Register16Bit>>(register_name)];
-  // Hopefully this will work with offset changes. I could use a template but technically less safe
-  // as the wrong register type could be passed in!
+byte_t RegisterSet::operator[](R8Bit register_name) const {
+  auto ptr = reinterpret_cast<const byte_t*>(this->raw_register_buffer_.data());
+  return ptr[toUnderlying<R8Bit>(register_name)];
 }
 
-word_t& RegisterSet::Get(Register16Bit register_name) {
-  word_t* ptr =
-      reinterpret_cast<word_t*>(this->raw_register_buffer_.data());
-  return ptr[static_cast<std::underlying_type_t<Register16Bit>>(register_name)];
+byte_t& RegisterSet::operator[](R8Bit register_name) {
+  auto ptr = reinterpret_cast<byte_t*>(this->raw_register_buffer_.data());
+  return ptr[toUnderlying<R8Bit>(register_name)];
+}
+
+word_t RegisterSet::operator[](R16Bit register_name) const {
+  auto ptr = reinterpret_cast<const word_t*>(this->raw_register_buffer_.data());
+  return ptr[toUnderlying<R16Bit>(register_name)];
+}
+
+word_t& RegisterSet::operator[](R16Bit register_name) {
+  auto ptr = reinterpret_cast<word_t*>(this->raw_register_buffer_.data());
+  return ptr[toUnderlying<R16Bit>(register_name)];
+}
+
+word_t RegisterSet::operator[](RComposite register_name) const {
+  auto ptr = reinterpret_cast<const byte_t*>(this->raw_register_buffer_.data());
+  auto hi_ptr = ptr + toUnderlying<RComposite>(register_name);
+  return (static_cast<word_t>(*hi_ptr) << 8) | *(hi_ptr + 1);
+}
+
+void RegisterSet::SetComposite(RComposite register_name, word_t value) {
+  auto ptr = reinterpret_cast<byte_t*>(this->raw_register_buffer_.data());
+  auto hi_ptr = ptr + toUnderlying<RComposite>(register_name);
+
+  hi_ptr[0] = static_cast<byte_t>((value >> 8) & 0xFF);
+  hi_ptr[1] = static_cast<byte_t>(value & 0xFF);
 }
 
 std::ostream& RegisterSet::PrettyDumpRegisters(std::ostream& os) const {
-  std::ios_base::fmtflags original_flags = os.flags();
-
-  os << std::hex << "A: 0x" << (unsigned)Get(Register8Bit::A) << "\tF: 0x"
-     << (unsigned)Get(Register8Bit::F) << "\nB: 0x"
-     << (unsigned)Get(Register8Bit::B) << "\tC: 0x"
-     << (unsigned)Get(Register8Bit::C) << "\nD: 0x"
-     << (unsigned)Get(Register8Bit::D) << "\tE: 0x"
-     << (unsigned)Get(Register8Bit::E) << "\nH: 0x"
-     << (unsigned)Get(Register8Bit::H) << "\tL: 0x"
-     << (unsigned)Get(Register8Bit::L) << "\nSP: 0x"
-     << (unsigned)Get(Register16Bit::SP) << "\nPC: 0x"
-     << (unsigned)Get(Register16Bit::PC) << std::endl;
-
-  // Restore flags
-  os.flags(original_flags);
+  os << "A: " << std::format("{:02x}", this->operator[](R8Bit::A))
+     << "\tF: " << std::format("{:02x}", this->operator[](R8Bit::F))
+     << "\nB: " << std::format("{:02x}", this->operator[](R8Bit::B))
+     << "\tC: " << std::format("{:02x}", this->operator[](R8Bit::C))
+     << "\nD: " << std::format("{:02x}", this->operator[](R8Bit::D))
+     << "\tE: " << std::format("{:02x}", this->operator[](R8Bit::E))
+     << "\nH: " << std::format("{:02x}", this->operator[](R8Bit::H))
+     << "\tL: " << std::format("{:02x}", this->operator[](R8Bit::L))
+     << "\nSP: " << std::format("{:04x}", this->operator[](R16Bit::SP))
+     << "\nPC: " << std::format("{:04x}", this->operator[](R16Bit::PC))
+     << std::endl;
 
   return os;
 }
 
 std::ostream& RegisterSet::DumpRegisters(std::ostream& os) const {
-  std::ios_base::fmtflags original_flags = os.flags();
+  os << "Register Buffer Dump:\n\t0x";
 
-  // Since in hex does it matter if it's signed or unsigned? thats why unary +
-  // is probably the cleaverest option
-  os << std::hex << "Register Buffer Dump:\n\t0x";
-
-  // Cast to unsigned char to avoid endinaness stuff
   const unsigned char* mem_ptr =
       reinterpret_cast<const unsigned char*>(this->raw_register_buffer_.data());
 
-  for (int i = 0; i < RegisterSet::kRawRegisterBufferSize; ++i) {
-    unsigned char byte = mem_ptr[i];
-    if (byte < 0x10) {
-      os << 0U;
-    }
-    os << (unsigned)mem_ptr[i];
+  for (int i = 0; i < RegisterSet::kRegistersByteSize; ++i) {
+    os << std::format("{:02x}", mem_ptr[i]);
   }
 
   os << std::endl;
-
-  // Restore flags
-  os.flags(original_flags);
 
   return os;
 }
