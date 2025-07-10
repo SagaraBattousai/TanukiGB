@@ -2,11 +2,12 @@
 set(memory_MODULE_ROOT "${MODULE_ROOT}/TanukiGB/memory")
 
 set(bootrom_headers "gameboy_rom.h" "gameboy_colour_rom.h")
-set(cpp_sources "memory.cpp" "bootrom.cpp")
+set(cpp_sources "bootrom.cpp" "mmu.cpp")
 set(c_sources "")
 set(memory_module 
   "${memory_MODULE_ROOT}/bootrom.h"
-  "${memory_MODULE_ROOT}/memory.h"
+  #"${memory_MODULE_ROOT}/memory.h"
+  "${memory_MODULE_ROOT}/mmu.h"
   "${memory_MODULE_ROOT}/addressable.h"
   )
 
