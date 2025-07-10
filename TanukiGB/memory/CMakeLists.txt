@@ -6,7 +6,8 @@ set(cpp_sources "memory.cpp" "bootrom.cpp")
 set(c_sources "")
 set(memory_module 
   "${memory_MODULE_ROOT}/bootrom.h"
-  "${memory_MODULE_ROOT}/memory.h" # Cant be internal
+  "${memory_MODULE_ROOT}/memory.h"
+  "${memory_MODULE_ROOT}/addressable.h"
   )
 
 add_library(memory SHARED ${cpp_sources} ${c_sources} ${bootrom_headers})

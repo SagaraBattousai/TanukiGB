@@ -5,8 +5,8 @@
 #include <tanukigb/types/types.h>
 
 #include <array>
-#include <ostream>
 #include <cstdint>
+#include <ostream>
 #include <type_traits>
 
 namespace tanukigb {
@@ -29,20 +29,18 @@ namespace tanukigb {
 
 class TANUKIGB_EXPORT RegisterSet {
  public:
-  
   RegisterSet();
 
-  // Could make template but it would require the underlying type of the enum to be the
-  // return type for now.
-  // 
+  // Could make template but it would require the underlying type of the enum to
+  // be the return type for now.
+  //
   // Return const scalars by value according to C++ ref (makes sence sepecially
   // since all our values are
   //  actually smaller than ptrs :P)
   //
-  // Wish I could make these inline as they all call an internal/private function but that would require
-  // exposing the 
+  // Wish I could make these inline as they all call an internal/private
+  // function but that would require exposing the
   //
-
 
   byte_t A() const noexcept;
   byte_t& A() noexcept;
@@ -92,18 +90,14 @@ class TANUKIGB_EXPORT RegisterSet {
   std::ostream& DumpRegisters(std::ostream& os) const;
 
  private:
-  using buffer_type = std::uint_fast32_t;  // greater/equal alignment to largest
-                                           // return type of register (word_t)
-  static constexpr int kRegistersByteSize = 12;
-  static constexpr int kRegistersBufferSize =
-      (kRegistersByteSize + (sizeof(buffer_type) - 1)) / sizeof(buffer_type);
-
-  std::array<buffer_type, kRegistersBufferSize> raw_register_buffer_;
+  using buffer_type = std::uint_fast8_t;
 
   // Forward declare private enums. I should probably leave it as int but ....
   enum class R8Bit : int_fast8_t;
   enum class R16Bit : std::underlying_type_t<R8Bit>;
   enum class RComposite : std::underlying_type_t<R8Bit>;
+
+  static constexpr int kRegistersBufferSize = 12;
 
   byte_t Get8Bit(R8Bit offset) const noexcept;
   byte_t& Get8Bit(R8Bit offset) noexcept;
@@ -114,6 +108,9 @@ class TANUKIGB_EXPORT RegisterSet {
   word_t GetComposite(RComposite offset) const noexcept;
   void SetComposite(RComposite offset, word_t value) noexcept;
 
+  // Alignment assures we can cast to pointers of byte_t and word_t
+  alignas(byte_t) alignas(word_t) alignas(buffer_type)
+      std::array<buffer_type, kRegistersBufferSize> raw_register_buffer_;
 };
 
 }  // namespace tanukigb

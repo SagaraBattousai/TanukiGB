@@ -147,11 +147,8 @@ std::ostream& RegisterSet::PrettyDumpRegisters(std::ostream& os) const {
 std::ostream& RegisterSet::DumpRegisters(std::ostream& os) const {
   os << "Register Buffer Dump:\n\t0x";
 
-  const unsigned char* mem_ptr =
-      reinterpret_cast<const unsigned char*>(this->raw_register_buffer_.data());
-
-  for (int i = 0; i < RegisterSet::kRegistersByteSize; ++i) {
-    os << std::format("{:02x}", mem_ptr[i]);
+  for (const byte_t& b : this->raw_register_buffer_ ) {
+    os << std::format("{:02x}", b);
   }
 
   os << std::endl;
