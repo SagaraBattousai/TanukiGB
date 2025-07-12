@@ -9,19 +9,30 @@
 
 namespace tanukigb {
 
-class TANUKIGB_EXPORT Bootrom : public Memory<Bootrom> {
+// NOTE: For now We will only consider the OG Gameboy, We will implement the 
+// Colour one after not simultaniously, I don't yet possess the skill or understanding.
+
+class TANUKIGB_EXPORT Bootrom {  // Fulfils ROM
  public:
   static Bootrom GBRom();
   static Bootrom CGBRom();
 
-  byte_t Read(word_t addr) const;
+  byte_t Read(word_t addr) const {
+    return rom_[addr];
+  }
+  
+  const int rom_size_;  // explicitly set but should be same as rom_.size()
 
  private:
-  Bootrom(std::vector<byte_t>&& rom) : rom_(std::move(rom)) {}
+  Bootrom(std::vector<byte_t>&& rom, int rom_size)
+      : rom_{std::move(rom)}, rom_size_{rom_size} {}
 
   // May change to shared_ptr array as it's "fixed size" but it seems a
   // bit...more work
   const std::vector<byte_t> rom_;
+
+  // No need to store value of the enable location since the boot rom need not
+  // know this info.
 };
 
 }  // namespace tanukigb

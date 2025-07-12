@@ -8,16 +8,15 @@
 
 namespace tanukigb {
 
+// These cannot be inline as we dont want the raw bytes in the header file!
+
 Bootrom Bootrom::GBRom() { 
-  return Bootrom(std::vector<byte_t>(GAMEBOY_BOOTROM_BYTES));
+  return Bootrom(std::vector<byte_t>(GAMEBOY_BOOTROM_BYTES),
+                 GAMEBOY_BOOTROM_SIZE);
 }
 
 Bootrom Bootrom::CGBRom() {
-  return Bootrom(std::vector<byte_t>{GAMEBOY_COLOUR_BOOTROM_BYTES});
-}
-
-byte_t Bootrom::Read(word_t addr) const {
-  return rom_[addr];
+  return Bootrom(std::vector<byte_t>{GAMEBOY_COLOUR_BOOTROM_BYTES}, GAMEBOY_COLOUR_BOOTROM_SIZE);
 }
 
 }  // namespace tanukigb

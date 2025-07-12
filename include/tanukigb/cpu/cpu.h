@@ -3,7 +3,7 @@
 
 #include <_TanukiGB_config.h>
 #include <tanukigb/cpu/register_set.h>
-#include <tanukigb/memory/bootrom.h>
+#include <tanukigb/memory/mmu.h>
 #include <tanukigb/types/types.h>
 
 #include <memory>
@@ -12,8 +12,8 @@
 namespace tanukigb {
 class TANUKIGB_EXPORT Cpu {
  public:
-  static Cpu GameboyCpu() { return Cpu(Bootrom::GBRom()); }
-  static Cpu ColourGameboyCpu() { return Cpu(Bootrom::CGBRom()); }
+  static Cpu GameboyCpu() { return Cpu(MMU::GameboyMMU()); }
+  static Cpu ColourGameboyCpu() { return Cpu(MMU::ColourGameboyMMU()); }
 
   ~Cpu() = default;
 
@@ -28,9 +28,9 @@ class TANUKIGB_EXPORT Cpu {
   }
 
  private:
-  Cpu(Bootrom&& bootrom);
+  Cpu(MMU&& mmu) : mmu_(std::move(mmu)), registers_() {};
 
-  Bootrom bootrom_;
+  MMU mmu_;
   RegisterSet registers_;
 };
 

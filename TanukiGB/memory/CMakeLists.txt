@@ -8,7 +8,7 @@ set(memory_module
   "${memory_MODULE_ROOT}/bootrom.h"
   #"${memory_MODULE_ROOT}/memory.h"
   "${memory_MODULE_ROOT}/mmu.h"
-  "${memory_MODULE_ROOT}/addressable.h"
+  "${memory_MODULE_ROOT}/concepts.h"
   )
 
 add_library(memory SHARED ${cpp_sources} ${c_sources} ${bootrom_headers})
