@@ -8,6 +8,8 @@
 #include <format>
 #include <iostream>
 #include <tuple>
+#include <type_traits>
+
 
 void RunGameBoy(tanukigb::Cpu& cpu) {
   int ret = cpu.Run();

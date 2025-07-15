@@ -41,9 +41,9 @@ enum class RegisterSet::RComposite : std::underlying_type_t<
   HL = R8Bit::H
 };
 
-RegisterSet::RegisterSet() : raw_register_buffer_() {
-  raw_register_buffer_.fill(0x00);
-}
+//RegisterSet::RegisterSet() : raw_register_buffer_() {
+//  raw_register_buffer_.fill(0x00);
+//}
 
 byte_t RegisterSet::A() const noexcept { return Get8Bit(R8Bit::A); }
 byte_t& RegisterSet::A() noexcept { return Get8Bit(R8Bit::A); }

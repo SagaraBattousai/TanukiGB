@@ -56,9 +56,7 @@ set(MODULE_ROOT "${TanukiGB_SOURCE_DIR}/include")
 
 set(BOOTROMS_SOURCE_DIR "${TanukiGB_SOURCE_DIR}/bootroms")
 
-add_subdirectory(app)
 add_subdirectory(TanukiGB)
-
 
 if(TanukiGB_BUILD_TESTS)
   enable_testing() 
@@ -82,13 +80,12 @@ include(GNUInstallDirs)
 # For now we'll use LINK_LIBRARIES as LINK_INTERFACE_LIBRARIES doesn't include the
 # public libraries for some reason, or maybe it's obvious.
 
-set(APP_TARGET "app")
-get_target_property(APP_LIBRARIES ${APP_TARGET} LINK_LIBRARIES)
-# get_target_property(APP_LIBRARIES ${APP_TARGET} LINK_INTERFACE_LIBRARIES)
+set(APPLICATION_TARGET "tanukigb_exe")
+get_target_property(APPLICATION_LIBRARIES ${APPLICATION_TARGET} LINK_LIBRARIES)
 
-install(TARGETS app DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS ${APPLICATION_TARGET} DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-foreach(library ${APP_LIBRARIES})
+foreach(library ${APPLICATION_LIBRARIES})
   install(TARGETS ${library}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -22,7 +22,7 @@ target_sources(cpu PUBLIC
   "${MODULE_ROOT}/_TanukiGB_config.h"
   )
 
-target_link_libraries(cpu memory types)
+target_link_libraries(cpu memory types utility)
 
 if (MSVC)
   target_compile_definitions(cpu PRIVATE TANUKIGB_BUILD_DLL)

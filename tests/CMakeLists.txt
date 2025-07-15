@@ -17,5 +17,11 @@ add_executable(
 
 target_link_libraries(tanukigb_tests cpu memory GTest::gtest_main)
 
+set_target_properties(tanukigb_tests PROPERTIES FOLDER Tests)
+
+if (WIN32)
+  copy_dlls_to_target(tanukigb_tests)
+endif()
+
 include(GoogleTest)
 gtest_discover_tests(tanukigb_tests)

@@ -9,6 +9,9 @@
 #include <ostream>
 #include <type_traits>
 
+// V defines bitmask operations for scoped enums
+#include<tanukigb/utility/enum_utils.h>
+
 namespace tanukigb {
 
 // I continuously forget my new solutions, this time was more disapointing than
@@ -29,7 +32,18 @@ namespace tanukigb {
 
 class TANUKIGB_EXPORT RegisterSet {
  public:
-  RegisterSet();
+  // Must be scoped as C and H are also function (register) names. Could call them _Flag but...
+  // Must be byte_t so it matches register type
+  // Bitmask functions implemented at end of header
+  enum class Flag : byte_t {
+    Z = (1 << 7),
+    N = (1 << 6),
+    H = (1 << 5),
+    C = (1 << 4)
+  };
+
+  // RegisterSet();
+  RegisterSet() : raw_register_buffer_() { raw_register_buffer_.fill(0x00); }
 
   // Could make template but it would require the underlying type of the enum to
   // be the return type for now.
@@ -48,7 +62,14 @@ class TANUKIGB_EXPORT RegisterSet {
   byte_t F() const noexcept;
   byte_t& F() noexcept;
 
-  // TODO: Flags
+  byte_t GetFlags() const noexcept { return F(); }
+  void SetFlags(Flag flags) noexcept { F() |= flags; }
+  void ClearFlags(Flag flags) noexcept { F() ^= flags; }
+
+  bool IsZFlagSet() const noexcept { return (F() & Flag::Z) != 0; }
+  bool IsNFlagSet() const noexcept { return (F() & Flag::N) != 0; }
+  bool IsHFlagSet() const noexcept { return (F() & Flag::H) != 0; }
+  bool IsCFlagSet() const noexcept { return (F() & Flag::C) != 0; }
 
   byte_t B() const noexcept;
   byte_t& B() noexcept;
@@ -111,6 +132,17 @@ class TANUKIGB_EXPORT RegisterSet {
   // Alignment assures we can cast to pointers of byte_t and word_t
   alignas(byte_t) alignas(word_t) alignas(buffer_type)
       std::array<buffer_type, kRegistersBufferSize> raw_register_buffer_;
+};
+
+
+
+
+
+enum class Flags : byte_t {
+  Z = (1 << 7),
+  N = (1 << 6),
+  H = (1 << 5),
+  C = (1 << 4)
 };
 
 }  // namespace tanukigb
