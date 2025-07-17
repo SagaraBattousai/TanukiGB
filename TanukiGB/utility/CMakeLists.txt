@@ -8,6 +8,7 @@ target_sources(utility PUBLIC
   FILE_SET HEADERS
   TYPE HEADERS
   BASE_DIRS ${MODULE_ROOT}
-  FILES #"${MODULE_ROOT}/_TanukiGB_config.h"
+  FILES
     "${utility_MODULE_ROOT}/enum_utils.h"
+    "${utility_MODULE_ROOT}/pimpl.h"
   )

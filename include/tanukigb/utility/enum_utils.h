@@ -19,7 +19,7 @@ inline constexpr std::underlying_type_t<E> to_underlying(E value) {
 
 template <enum_type E>
 inline constexpr E& operator|=(E& lhs, E rhs) {
-  return static_cast<E>(to_underlying(lhs) |= to_underlying(rhs));
+  return static_cast<E&>(to_underlying(lhs) |= to_underlying(rhs));
 }
 
 template <enum_type E>
@@ -30,8 +30,7 @@ inline constexpr E& operator|=(E& lhs, std::underlying_type_t<E> rhs) {
 template <enum_type E>
 inline constexpr std::underlying_type_t<E> operator|=(
     std::underlying_type_t<E>& lhs, E rhs) {
-  lhs |= to_underlying(rhs);
-  return lhs;
+  return lhs |= to_underlying(rhs);
 }
 
 template <enum_type E>
@@ -41,7 +40,7 @@ inline constexpr E operator|(E lhs, E rhs) {
 
 template <enum_type E>
 inline constexpr E operator|(E lhs, std::underlying_type_t<E> rhs) {
-  return to_underlying(lhs) | rhs;
+  return static_cast<E>(to_underlying(lhs) | rhs);
 }
 
 template <enum_type E>
@@ -56,7 +55,7 @@ inline constexpr std::underlying_type_t<E> operator|(
 
 template <enum_type E>
 inline constexpr E& operator&=(E& lhs, E rhs) {
-  return static_cast<E>(to_underlying(lhs) &= to_underlying(rhs));
+  return static_cast<E&>(to_underlying(lhs) &= to_underlying(rhs));
 }
 
 template <enum_type E>
@@ -67,8 +66,7 @@ inline constexpr E& operator&=(E& lhs, std::underlying_type_t<E> rhs) {
 template <enum_type E>
 inline constexpr std::underlying_type_t<E> operator&=(
     std::underlying_type_t<E>& lhs, E rhs) {
-  lhs &= to_underlying(rhs);
-  return lhs;
+  return lhs &= to_underlying(rhs);
 }
 
 template <enum_type E>
@@ -78,7 +76,7 @@ inline constexpr E operator&(E lhs, E rhs) {
 
 template <enum_type E>
 inline constexpr E operator&(E lhs, std::underlying_type_t<E> rhs) {
-  return to_underlying(lhs) & rhs;
+  return static_cast<E>(to_underlying(lhs) & rhs);
 }
 
 template <enum_type E>
@@ -93,7 +91,7 @@ inline constexpr std::underlying_type_t<E> operator&(
 
 template <enum_type E>
 inline constexpr E& operator^=(E& lhs, E rhs) {
-  return static_cast<E>(to_underlying(lhs) ^= to_underlying(rhs));
+  return static_cast<E&>(to_underlying(lhs) ^= to_underlying(rhs));
 }
 
 template <enum_type E>
@@ -104,8 +102,7 @@ inline constexpr E& operator^=(E& lhs, std::underlying_type_t<E> rhs) {
 template <enum_type E>
 inline constexpr std::underlying_type_t<E> operator^=(
     std::underlying_type_t<E>& lhs, E rhs) {
-  lhs ^= to_underlying(rhs);
-  return lhs;
+  return lhs ^= to_underlying(rhs);
 }
 
 template <enum_type E>
@@ -115,7 +112,7 @@ inline constexpr E operator^(E lhs, E rhs) {
 
 template <enum_type E>
 inline constexpr E operator^(E lhs, std::underlying_type_t<E> rhs) {
-  return to_underlying(lhs) ^ rhs;
+  return static_cast<E>(to_underlying(lhs) ^ rhs);
 }
 
 template <enum_type E>
@@ -130,7 +127,7 @@ inline constexpr std::underlying_type_t<E> operator^(
 
 template <enum_type E>
 inline constexpr E operator~(E value) {
-  return ~to_underlying(value);
+  return static_cast<E>(~to_underlying(value));
 }
 
 }  // namespace tanukigb

@@ -42,7 +42,7 @@ class TANUKIGB_EXPORT RegisterSet {
     C = (1 << 4)
   };
 
-  // RegisterSet();
+  // remove fill later as this wont always be the case
   RegisterSet() : raw_register_buffer_() { raw_register_buffer_.fill(0x00); }
 
   // Could make template but it would require the underlying type of the enum to
@@ -64,7 +64,8 @@ class TANUKIGB_EXPORT RegisterSet {
 
   byte_t GetFlags() const noexcept { return F(); }
   void SetFlags(Flag flags) noexcept { F() |= flags; }
-  void ClearFlags(Flag flags) noexcept { F() ^= flags; }
+  void ClearFlags(Flag flags) noexcept { F() &= ~flags; }
+  //void ToggleFlags(Flag flags) noexcept { F() ^= flags; }
 
   bool IsZFlagSet() const noexcept { return (F() & Flag::Z) != 0; }
   bool IsNFlagSet() const noexcept { return (F() & Flag::N) != 0; }

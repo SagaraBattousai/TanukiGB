@@ -2,36 +2,43 @@
 #define __TANUKIGB_CPU_CPU_H__
 
 #include <_TanukiGB_config.h>
-#include <tanukigb/cpu/register_set.h>
-#include <tanukigb/memory/mmu.h>
-#include <tanukigb/types/types.h>
 
-#include <memory>
-#include <ostream>
+#include <tanukigb/utility/pimpl.h>
+
+
 
 namespace tanukigb {
 class TANUKIGB_EXPORT Cpu {
  public:
-  static Cpu GameboyCpu() { return Cpu(MMU::GameboyMMU()); }
-  static Cpu ColourGameboyCpu() { return Cpu(MMU::ColourGameboyMMU()); }
+  static Cpu GameboyCpu();
+  static Cpu ColourGameboyCpu();
 
-  ~Cpu() = default;
+  // Must be defined (=default) in the impl file as we're using Pimpl 
+  ~Cpu();
+
+  // Deleted For now
+  Cpu(const Cpu&) = delete;
+
+  // Must be defined (=default) in the impl file as we're using Pimpl
+  Cpu(Cpu&&);
+
+  // Deleted For now
+  Cpu& operator=(const Cpu&) = delete;
+
+  // Must be defined (=default) in the impl file as we're using Pimpl
+  Cpu& operator=(Cpu&&);
 
   int Run();
 
-  std::ostream& DumpRegisters(std::ostream& os) const {
-    return registers_.DumpRegisters(os);
-  }
-
-  std::ostream& PrettyDumpRegisters(std::ostream& os) const {
-    return registers_.PrettyDumpRegisters(os);
-  }
+  std::ostream& DumpRegisters(std::ostream& os) const;
+  std::ostream& PrettyDumpRegisters(std::ostream& os) const;
 
  private:
-  Cpu(MMU&& mmu) : mmu_(std::move(mmu)), registers_() {};
+  class CpuImpl;
+  Cpu(Pimpl<CpuImpl>&&);
 
-  MMU mmu_;
-  RegisterSet registers_;
+  //Do Not Call Directly
+  Pimpl<CpuImpl> impl_;
 };
 
 }  // namespace tanukigb
