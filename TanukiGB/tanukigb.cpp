@@ -39,7 +39,7 @@ int main() {
 
   int x = 0;
 
-  auto get = [&x]() -> int& { return x; };
+  auto get = [&x]() -> const int& { return x; };
   auto cset = [&x](const int& rhs) -> int& {
     x = rhs;
     return x;
@@ -51,7 +51,9 @@ int main() {
 
 
   // Not really how properties should work but lets have a look :)
-  tanukigb::Property<int, decltype(get), decltype(cset), decltype(mset)> px(get, cset, mset);
+  tanukigb::FreeProperty<int, decltype(get), decltype(cset), decltype(mset)> px{
+      get, cset, mset};
+  //tanukigb::Property<int> px(get, cset, mset);
 
   std::cout << "px = " << px << " x = " << x << std::endl;
 

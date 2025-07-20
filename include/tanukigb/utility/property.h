@@ -15,39 +15,40 @@ template <typename T>
 concept NonReference = !std::is_reference_v<T>;
 
 template <typename Fn, typename ValueType>
-concept Getter =
+concept Free_Getter_Invokable =
     std::is_invocable_r_v<ValueType, Fn> ||
     std::is_invocable_r_v<const std::add_lvalue_reference_t<ValueType>, Fn>;
 
 template <typename Fn, typename ValueType>
-concept Copy_Setter =
+concept Free_Copy_Setter_Invokable =
     std::is_invocable_r_v<std::add_lvalue_reference_t<ValueType>, Fn,
                           const std::add_lvalue_reference_t<ValueType>>;
 
 template <typename Fn, typename ValueType>
-concept Move_Setter = std::is_invocable_r_v<
+concept Free_Move_Setter_Invokable = std::is_invocable_r_v<
     std::add_lvalue_reference_t<ValueType>, Fn,
     std::add_rvalue_reference_t<std::remove_reference_t<ValueType>>>;
+
 }  // namespace
 
-// TODO: Can I use static assert to call error if write is called on read only
-// property?
-//       or should I make it a different name or basec class??
-
-template <NonReference T, Getter<T> GetterFn, Copy_Setter<T> CopySetterFn,
-          Move_Setter<T> MoveSetterFn>
-class Property {
- private:
-  using value_type = T;
+// Free Getter, Copy Setter and Move Setter
+ template <NonReference T, Free_Getter_Invokable<T> GetterFn,
+          Free_Copy_Setter_Invokable<T> CopySetterFn,
+          Free_Move_Setter_Invokable<T> MoveSetterFn>
+class FreeProperty {
+ public:
+  //using value_type = T;
+  typedef T value_type;
   using reference = value_type&;
+  using getter_type = GetterFn;
 
  public:
-  Property(GetterFn gf, CopySetterFn cf, MoveSetterFn mf)
+  FreeProperty(GetterFn gf, CopySetterFn cf, MoveSetterFn mf)
       : gf_{gf}, cf_{cf}, mf_{mf} {}
-  ~Property() = default;
+  ~FreeProperty() = default;
 
-  Property(const T&) = delete;
-  Property(T&&) = delete;
+  FreeProperty(const T&) = delete;
+  FreeProperty(T&&) = delete;
 
   // Should operator= return ref to T or ref to Property??
   // Ordinarilly I'd say Property but here the Get and Set are delegates so...
