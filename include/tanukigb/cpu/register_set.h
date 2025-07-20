@@ -1,40 +1,32 @@
 #ifndef __TANUKIGB_CPU_REGISTER_SET_H__
 #define __TANUKIGB_CPU_REGISTER_SET_H__
 
+//NOTE: We were going to merge register set into cpu, which, despite reducing modularity
+// it would have avoided the need for forwarding calls. However modularity is prefered to
+// writing boilerplate (but I cant remember why i changed my mind :P )
+
 #include <_TanukiGB_config.h>
-#include <tanukigb/types/types.h>
 
 #include <array>
 #include <cstdint>
 #include <ostream>
 #include <type_traits>
 
+#include <tanukigb/types/types.h>
 // V defines bitmask operations for scoped enums
-#include<tanukigb/utility/enum_utils.h>
+#include <tanukigb/utility/enum_utils.h>
 
 namespace tanukigb {
 
-// I continuously forget my new solutions, this time was more disapointing than
-// usual, however here's
-//    where we stand.
-// 1) Registers are, as far as I can tell at the moment, variables and therefore
-// should just return a
-//    reference or copy to their underlying value.
-// 2) Whilst there is a comminality between individual registers and registers
-// as a concept, at the moment
-//    (especially as this isnt really a library (yet)) it makes more sence to
-//    make a bespoke model so far (and potentially see if we can once again
-//    generalise this, although the issue of alignment is rough).
-//
-// Technically it is possible with a parameter pack but I cant quite workout how
-// without revealing the underlying implementation.
+// Once again Ive had another idea as I had a nap (two infact, one for a register set 
+// and one for a property-esque class and once again ive forgotten :( 
 //
 
 class TANUKIGB_EXPORT RegisterSet {
  public:
-  // Must be scoped as C and H are also function (register) names. Could call them _Flag but...
-  // Must be byte_t so it matches register type
-  // Bitmask functions implemented at end of header
+  // Must be scoped as C and H are also function (register) names. Could call
+  // them _Flag but... Must be byte_t so it matches register type Bitmask
+  // functions implemented at end of header
   enum class Flag : byte_t {
     Z = (1 << 7),
     N = (1 << 6),
@@ -65,7 +57,7 @@ class TANUKIGB_EXPORT RegisterSet {
   byte_t GetFlags() const noexcept { return F(); }
   void SetFlags(Flag flags) noexcept { F() |= flags; }
   void ClearFlags(Flag flags) noexcept { F() &= ~flags; }
-  //void ToggleFlags(Flag flags) noexcept { F() ^= flags; }
+  // void ToggleFlags(Flag flags) noexcept { F() ^= flags; }
 
   bool IsZFlagSet() const noexcept { return (F() & Flag::Z) != 0; }
   bool IsNFlagSet() const noexcept { return (F() & Flag::N) != 0; }
@@ -134,10 +126,6 @@ class TANUKIGB_EXPORT RegisterSet {
   alignas(byte_t) alignas(word_t) alignas(buffer_type)
       std::array<buffer_type, kRegistersBufferSize> raw_register_buffer_;
 };
-
-
-
-
 
 enum class Flags : byte_t {
   Z = (1 << 7),

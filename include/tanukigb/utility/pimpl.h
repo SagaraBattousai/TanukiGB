@@ -14,7 +14,7 @@ namespace tanukigb {
 template<typename Impl>
 class Pimpl {
  public:
-  Pimpl() : impl_(std::make_unique()) {}
+  Pimpl() : impl_(std::make_unique<Impl>()) {}
  template <typename... Args>
   Pimpl(Args&&... args) : impl_(std::make_unique<Impl, Args...>(std::forward<Args>(args)...)) {}
   ~Pimpl() = default;

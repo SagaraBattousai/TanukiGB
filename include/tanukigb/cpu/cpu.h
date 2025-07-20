@@ -5,39 +5,34 @@
 
 #include <tanukigb/utility/pimpl.h>
 
-
-
 namespace tanukigb {
 class TANUKIGB_EXPORT Cpu {
  public:
   static Cpu GameboyCpu();
   static Cpu ColourGameboyCpu();
 
+  // The following Constructors, destructors and operator='s
   // Must be defined (=default) in the impl file as we're using Pimpl 
   ~Cpu();
-
-  // Deleted For now
-  Cpu(const Cpu&) = delete;
-
-  // Must be defined (=default) in the impl file as we're using Pimpl
   Cpu(Cpu&&);
-
-  // Deleted For now
-  Cpu& operator=(const Cpu&) = delete;
-
-  // Must be defined (=default) in the impl file as we're using Pimpl
   Cpu& operator=(Cpu&&);
 
-  int Run();
 
+  // The following copy functions (Constructor and operator=) are deleted
+  //  for now
+  Cpu(const Cpu&) = delete;
+  Cpu& operator=(const Cpu&) = delete;
+
+
+  int Run();
   std::ostream& DumpRegisters(std::ostream& os) const;
   std::ostream& PrettyDumpRegisters(std::ostream& os) const;
 
  private:
   class CpuImpl;
+
   Cpu(Pimpl<CpuImpl>&&);
 
-  //Do Not Call Directly
   Pimpl<CpuImpl> impl_;
 };
 

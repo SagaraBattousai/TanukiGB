@@ -11,4 +11,5 @@ target_sources(utility PUBLIC
   FILES
     "${utility_MODULE_ROOT}/enum_utils.h"
     "${utility_MODULE_ROOT}/pimpl.h"
+    "${utility_MODULE_ROOT}/property.h"
   )
