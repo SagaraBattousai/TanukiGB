@@ -17,10 +17,18 @@ template <typename R, typename CC, typename... Args>
 using member_function_ptr_t =
     typename member_function_ptr<R, CC, Args...>::type;
 
+template <typename R, typename CC, typename... Args>
+struct const_member_function_ptr {
+  typedef R (CC::*type)(Args...) const;
+};
+template <typename R, typename CC, typename... Args>
+using const_member_function_ptr_t =
+    typename const_member_function_ptr<R, CC, Args...>::type;
+
 template <typename T, typename CC>
 class copy_assign_member_function_ptr {
  private:
-  using reference = std::add_lvalue_reference<T>;
+  using reference = std::add_lvalue_reference_t<T>;
 
  public:
   typedef reference (CC::*type)(const reference);
@@ -33,7 +41,7 @@ template <typename T, typename CC>
 class move_assign_member_function_ptr {
  private:
   using non_reference = std::remove_reference_t<T>;
-  using reference = std::add_lvalue_reference<T>;
+  using reference = std::add_lvalue_reference_t<T>;
   using rvalue_reference = std::add_rvalue_reference_t<non_reference>;
 
  public:
@@ -45,27 +53,40 @@ using move_assign_member_function_ptr_t =
 
 }  // namespace
 
-// AM I going a bit crazy or could I also pass the containing class as a non
-// type parameter? Theoretically a setter only property can make sence but in
-// that case alternatives are probably better. template <typename T, typename
-// CC, member_function_ptr_t<T, CC> Getter>
-template <typename T, typename CC, member_function_ptr_t<T, CC> Getter,
-          copy_assign_member_function_ptr_t<T, CC> CopySetter = nullptr,
-          move_assign_member_function_ptr_t<T, CC> MoveSetter = nullptr>
+// Although it is theoretically possible to have a property with no getter
+// it's such a corner case it's better to force setting of getter to nullptr
+// manually
+//
+// Is forcing the getter to be const good?
+//
+// Could remove need to hold reference to ContainingClass by taking it as a
+// param but as we want this to be syntatic sugar (and it could be exploited)
+// its better not to.
+//
+template <
+    typename T, typename ContainingClass,
+    const_member_function_ptr_t<T, ContainingClass> Getter,
+    copy_assign_member_function_ptr_t<T, ContainingClass> CopySetter = nullptr,
+    move_assign_member_function_ptr_t<T, ContainingClass> MoveSetter = nullptr>
 class Property {
  private:
   using non_reference = std::remove_reference_t<T>;
-  using reference = std::add_lvalue_reference<T>;
+  using reference = std::add_lvalue_reference_t<T>;
   using rvalue_reference = std::add_rvalue_reference_t<non_reference>;
 
  public:
-  Property(CC& container) : container_{container} {}
+  Property(ContainingClass& container) : container_{container} {}
   ~Property() = default;
 
   Property(const Property&) = delete;
   Property(Property&&) = delete;
 
-  operator T() { return (container_.*Getter)(); }
+  operator T() {
+    static_assert(Getter != nullptr,
+                  "Cannot call deleted Conversion (T()) AKA No getter set."
+                  " If this is required, pass a Getter template parameter");
+    return (container_.*Getter)();
+  }
 
   reference operator=(const reference rhs) {
     static_assert(CopySetter != nullptr,
@@ -82,42 +103,38 @@ class Property {
   }
 
  private:
-  CC& container_;
+  ContainingClass& container_;
 };
 
 template <typename T, bool ReadOnly = false>
 class SelfBackedProperty {
  private:
   using non_reference = std::remove_reference_t<T>;
+  using reference = std::add_lvalue_reference_t<T>;
   using rvalue_reference = std::add_rvalue_reference_t<non_reference>;
 
  public:
   using value_type = std::conditional_t<ReadOnly, const T, T>;
 
   SelfBackedProperty() : value_{} {}
+  SelfBackedProperty(T initial_value) : value_{initial_value} {}
+  SelfBackedProperty(const reference initial_value) : value_{initial_value} {}
+  SelfBackedProperty(rvalue_reference initial_value)
+      : value_{std::move(initial_value)} {}
   ~SelfBackedProperty() = default;
 
   SelfBackedProperty(const SelfBackedProperty&) = delete;
   SelfBackedProperty(SelfBackedProperty&&) = delete;
 
-  // No (by) Value constructor to simplify despite that by value is good for
-  // literal types...
-
-  SelfBackedProperty(const T& initial_value) : value_{initial_value} {}
-  SelfBackedProperty(rvalue_reference initial_value)
-      : value_{std::move(initial_value)} {}
-
   operator value_type() { return value_; }
 
-  // TODO: may have an issue here
-  T operator=(const T& rhs) {
+  T operator=(const reference rhs) {
     static_assert(!ReadOnly,
                   "Cannot call deleted copy asignment (T operator=(const T&)) "
                   "on ReadOnly Property");
     return value_ = rhs;
   }
 
-  // TODO: may have an issue here
   T operator=(rvalue_reference rhs) {
     static_assert(!ReadOnly,
                   "Cannot call deleted move asignment (T operator=(T&&)) "

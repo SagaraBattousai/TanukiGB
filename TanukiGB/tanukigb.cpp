@@ -18,11 +18,18 @@ using tanukigb::word_t;
 class Foo {
  private:
   int x_;
-  int GetX() { return x_; }
+  int GetX() const { return x_; }
+
+ public:
+  int& SetX(int&& x) {
+    x_ = std::move(x);
+    return x_;
+  }
+  Foo& self = *this;
+
  public:
   Foo() : x_{37}, p{*this} {}
-  tanukigb::Property<int, Foo, &Foo::GetX> p;
- 
+  tanukigb::Property<int, Foo, &Foo::GetX, nullptr, &Foo::SetX> p;
 };
 
 void RunGameBoy(tanukigb::Cpu& cpu) {
@@ -34,6 +41,8 @@ void RunGameBoy(tanukigb::Cpu& cpu) {
   }
 }
 
+// using MFP = int&(Foo::*)(int&& v);
+
 int main() {
   tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
   RunGameBoy(cpu);
@@ -42,6 +51,11 @@ int main() {
   Foo f{};
 
   std::cout << "prop p = " << f.p << std::endl;
+
+  f.p = 9;
+
+  std::cout << "prop p = " << f.p << std::endl;
+
 
   return 0;
 }
