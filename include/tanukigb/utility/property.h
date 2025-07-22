@@ -7,16 +7,30 @@
 
 namespace tanukigb {
 
-template <typename T, typename ContainingClass, bool ReadOnly,
-          bool CopyAssignable, bool MoveAssignable>
-class Property {
-  static_assert(false,
-                "Primary template class should not be posible to instantiate");
+namespace {
+
+template <typename T, typename ContainingClass, typename U>
+struct PropertyHolder {
+  PropertyHolder(T t, ContainingClass c, U u) : t_{t}, c_{c}, u_{u} {}
+
+  T t_;
+  ContainingClass& c_;
+  U u_;
 };
+
+template <typename T, typename ContainingClass>
+struct PropertyHolder<T, ContainingClass, std::nullptr_t> {
+  PropertyHolder(T t, ContainingClass c) : t_{t}, c_{c} {}
+
+  T t_;
+  ContainingClass& c_;
+};
+
+}  // namespace
 
 // ReadWrite, Move and Copy assignable
 template <typename T, typename ContainingClass>
-class Property<T, ContainingClass, false, true, true> {
+class Property {
  private:
   using non_reference = std::remove_reference_t<T>;
   using reference = std::add_lvalue_reference<T>;
@@ -24,9 +38,9 @@ class Property<T, ContainingClass, false, true, true> {
 
   using getter_type = T (ContainingClass::*)();
   using copy_setter_type =
-      typename reference(ContainingClass::*)(const reference);
+      typename reference (ContainingClass::*)(const reference);
   using move_setter_type =
-      typename reference(ContainingClass::*)(rvalue_reference);
+      typename reference (ContainingClass::*)(rvalue_reference);
 
  public:
   Property(ContainingClass& container, getter_type getter,
@@ -55,12 +69,11 @@ class Property<T, ContainingClass, false, true, true> {
   getter_type getter_;
   copy_setter_type copy_setter_;
   move_setter_type move_setter_;
+  //PropertyHolder ph_;
 };
 
-// Readonly (therfore copy and move assignable are irrelevant)
-template <typename T, typename ContainingClass, bool CopyAssignable,
-          bool MoveAssignable>
-class Property<T, ContainingClass, true, CopyAssignable, MoveAssignable> {
+template <typename T, typename ContainingClass>
+class ReadOnlyProperty {
  private:
   using non_reference = std::remove_reference_t<T>;
   using reference = std::add_lvalue_reference<T>;
@@ -69,13 +82,12 @@ class Property<T, ContainingClass, true, CopyAssignable, MoveAssignable> {
   using getter_type = T (ContainingClass::*)();
 
  public:
-  Property(ContainingClass& container, getter_type getter)
-      : container_{container},
-        getter_{getter} {}
-  ~Property() = default;
+  ReadOnlyProperty(ContainingClass& container, getter_type getter)
+      : container_{container}, getter_{getter} {}
+  ~ReadOnlyProperty() = default;
 
-  Property(const Property&) = delete;
-  Property(Property&&) = delete;
+  ReadOnlyProperty(const ReadOnlyProperty&) = delete;
+  ReadOnlyProperty(ReadOnlyProperty&&) = delete;
 
   operator T() { return container_.*getter_(); }
 
@@ -89,79 +101,78 @@ class Property<T, ContainingClass, true, CopyAssignable, MoveAssignable> {
 };
 
 // Copy but not Move Assignable
-template <typename T, typename ContainingClass>
-class Property<T, ContainingClass, false, true, false> {
- private:
-  using non_reference = std::remove_reference_t<T>;
-  using reference = std::add_lvalue_reference<T>;
-  using rvalue_reference = std::add_rvalue_reference_t<non_reference>;
-
-  using getter_type = T (ContainingClass::*)();
-  using copy_setter_type =
-      typename reference (ContainingClass::*)(const reference);
-
- public:
-  Property(ContainingClass& container, getter_type getter,
-           copy_setter_type copy_setter)
-      : container_{container},
-        getter_{getter},
-        copy_setter_{copy_setter} {}
-  ~Property() = default;
-
-  Property(const Property&) = delete;
-  Property(Property&&) = delete;
-
-  operator T() { return container_.*getter_(); }
-
-  reference operator=(const reference rhs) {
-    return container_.*copy_setter_(rhs);
-  }
-
-  reference operator=(rvalue_reference rhs) = delete;
-
- private:
-  ContainingClass& container_;
-  getter_type getter_;
-  copy_setter_type copy_setter_;
-};
-
-// Move but not Copy Assignable
-template <typename T, typename ContainingClass>
-class Property<T, ContainingClass, false, false, true> {
- private:
-  using non_reference = std::remove_reference_t<T>;
-  using reference = std::add_lvalue_reference<T>;
-  using rvalue_reference = std::add_rvalue_reference_t<non_reference>;
-
-  using getter_type = T (ContainingClass::*)();
-  using move_setter_type =
-      typename reference (ContainingClass::*)(rvalue_reference);
-
- public:
-  Property(ContainingClass& container, getter_type getter,  move_setter_type move_setter)
-      : container_{container},
-        getter_{getter},
-        move_setter_{move_setter} {}
-  ~Property() = default;
-
-  Property(const Property&) = delete;
-  Property(Property&&) = delete;
-
-  operator T() { return container_.*getter_(); }
-
-  reference operator=(const reference rhs) = delete;
-
-  reference operator=(rvalue_reference rhs) {
-    return container_.*move_setter_(std::move(rhs));
-  }
-
- private:
-  ContainingClass& container_;
-  getter_type getter_;
-  move_setter_type move_setter_;
-};
-
-
+// template <typename T, typename ContainingClass>
+// class Property<T, ContainingClass, false, true, false> {
+// private:
+//  using non_reference = std::remove_reference_t<T>;
+//  using reference = std::add_lvalue_reference<T>;
+//  using rvalue_reference = std::add_rvalue_reference_t<non_reference>;
+//
+//  using getter_type = T (ContainingClass::*)();
+//  using copy_setter_type =
+//      typename reference (ContainingClass::*)(const reference);
+//
+// public:
+//  Property(ContainingClass& container, getter_type getter,
+//           copy_setter_type copy_setter)
+//      : container_{container},
+//        getter_{getter},
+//        copy_setter_{copy_setter} {}
+//  ~Property() = default;
+//
+//  Property(const Property&) = delete;
+//  Property(Property&&) = delete;
+//
+//  operator T() { return container_.*getter_(); }
+//
+//  reference operator=(const reference rhs) {
+//    return container_.*copy_setter_(rhs);
+//  }
+//
+//  reference operator=(rvalue_reference rhs) = delete;
+//
+// private:
+//  ContainingClass& container_;
+//  getter_type getter_;
+//  copy_setter_type copy_setter_;
+//};
+//
+//// Move but not Copy Assignable
+// template <typename T, typename ContainingClass>
+// class Property<T, ContainingClass, false, false, true> {
+//  private:
+//   using non_reference = std::remove_reference_t<T>;
+//   using reference = std::add_lvalue_reference<T>;
+//   using rvalue_reference = std::add_rvalue_reference_t<non_reference>;
+//
+//   using getter_type = T (ContainingClass::*)();
+//   using move_setter_type =
+//       typename reference (ContainingClass::*)(rvalue_reference);
+//
+//  public:
+//   Property(ContainingClass& container, getter_type getter,  move_setter_type
+//   move_setter)
+//       : container_{container},
+//         getter_{getter},
+//         move_setter_{move_setter} {}
+//   ~Property() = default;
+//
+//   Property(const Property&) = delete;
+//   Property(Property&&) = delete;
+//
+//   operator T() { return container_.*getter_(); }
+//
+//   reference operator=(const reference rhs) = delete;
+//
+//   reference operator=(rvalue_reference rhs) {
+//     return container_.*move_setter_(std::move(rhs));
+//   }
+//
+//  private:
+//   ContainingClass& container_;
+//   getter_type getter_;
+//   move_setter_type move_setter_;
+// };
 
 // Useful when member style access is wanted only allowing set and get.
 // Originally an unused primary template but we can actually do everything here

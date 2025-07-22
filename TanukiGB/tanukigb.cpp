@@ -17,9 +17,6 @@ using tanukigb::word_t;
 
 class Foo {
  public:
-  tanukigb::Property<int, Foo, true, false, true> p{*this, &Foo::GetX};
-
- private:
   int x_;
   int GetX() { return x_; }
 };
@@ -38,8 +35,7 @@ int main() {
   RunGameBoy(cpu);
   cpu.PrettyDumpRegisters(std::cout);
 
-  std::cout << "Sizeof(Foo) = " << sizeof(Foo) << " Sizeof Foo.p "
-            << sizeof(decltype(std::declval<Foo>().p)) << std::endl;
+ 
 
   return 0;
 }
