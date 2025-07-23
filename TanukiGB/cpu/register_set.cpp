@@ -1,4 +1,4 @@
-
+/*
 #include <tanukigb/cpu/register_set.h>
 #include <tanukigb/utility/enum_utils.h>
 
@@ -151,3 +151,5 @@ std::ostream& RegisterSet::DumpRegisters(std::ostream& os) const {
   return os;
 }
 }  // namespace tanukigb
+
+*/

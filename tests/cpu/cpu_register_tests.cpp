@@ -6,7 +6,7 @@
 
 namespace tanukigb {
 namespace tests {
-
+/*
 class RegisterSetTest : public testing::Test {
  protected:
   RegisterSet rs;
@@ -75,6 +75,8 @@ INSTANTIATE_TEST_SUITE_P(
           return "CFlag";
       }
     });
+
+    */
 
 }  // namespace tests
 }  // namespace tanukigb

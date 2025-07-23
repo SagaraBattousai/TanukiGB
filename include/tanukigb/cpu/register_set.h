@@ -1,139 +1,112 @@
 #ifndef __TANUKIGB_CPU_REGISTER_SET_H__
 #define __TANUKIGB_CPU_REGISTER_SET_H__
 
-//NOTE: We were going to merge register set into cpu, which, despite reducing modularity
-// it would have avoided the need for forwarding calls. However modularity is prefered to
-// writing boilerplate (but I cant remember why i changed my mind :P )
-
-#include <_TanukiGB_config.h>
-
 #include <array>
-#include <cstdint>
+#include <climits>
+#include <concepts>
+#include <format>
 #include <ostream>
-#include <type_traits>
-
-#include <tanukigb/types/types.h>
-// V defines bitmask operations for scoped enums
-#include <tanukigb/utility/enum_utils.h>
 
 namespace tanukigb {
 
-// Once again Ive had another idea as I had a nap (two infact, one for a register set 
-// and one for a property-esque class and once again ive forgotten :( 
+// I can't work out if reinterpret_Cast is acceptable for this use with type
+// accessability
 //
-
-class TANUKIGB_EXPORT RegisterSet {
- public:
-  // Must be scoped as C and H are also function (register) names. Could call
-  // them _Flag but... Must be byte_t so it matches register type Bitmask
-  // functions implemented at end of header
-  enum class Flag : byte_t {
-    Z = (1 << 7),
-    N = (1 << 6),
-    H = (1 << 5),
-    C = (1 << 4)
-  };
-
-  // remove fill later as this wont always be the case
-  RegisterSet() : raw_register_buffer_() { raw_register_buffer_.fill(0x00); }
-
-  // Could make template but it would require the underlying type of the enum to
-  // be the return type for now.
-  //
-  // Return const scalars by value according to C++ ref (makes sence sepecially
-  // since all our values are
-  //  actually smaller than ptrs :P)
-  //
-  // Wish I could make these inline as they all call an internal/private
-  // function but that would require exposing the
-  //
-
-  byte_t A() const noexcept;
-  byte_t& A() noexcept;
-
-  byte_t F() const noexcept;
-  byte_t& F() noexcept;
-
-  byte_t GetFlags() const noexcept { return F(); }
-  void SetFlags(Flag flags) noexcept { F() |= flags; }
-  void ClearFlags(Flag flags) noexcept { F() &= ~flags; }
-  // void ToggleFlags(Flag flags) noexcept { F() ^= flags; }
-
-  bool IsZFlagSet() const noexcept { return (F() & Flag::Z) != 0; }
-  bool IsNFlagSet() const noexcept { return (F() & Flag::N) != 0; }
-  bool IsHFlagSet() const noexcept { return (F() & Flag::H) != 0; }
-  bool IsCFlagSet() const noexcept { return (F() & Flag::C) != 0; }
-
-  byte_t B() const noexcept;
-  byte_t& B() noexcept;
-
-  byte_t C() const noexcept;
-  byte_t& C() noexcept;
-
-  byte_t D() const noexcept;
-  byte_t& D() noexcept;
-
-  byte_t E() const noexcept;
-  byte_t& E() noexcept;
-
-  byte_t H() const noexcept;
-  byte_t& H() noexcept;
-
-  byte_t L() const noexcept;
-  byte_t& L() noexcept;
-
-  word_t SP() const noexcept;
-  word_t& SP() noexcept;
-
-  word_t PC() const noexcept;
-  word_t& PC() noexcept;
-
-  word_t AF() const noexcept;
-  void SetAF(word_t value) noexcept;
-
-  word_t BC() const noexcept;
-  void SetBC(word_t value) noexcept;
-
-  word_t DE() const noexcept;
-  void SetDE(word_t value) noexcept;
-
-  word_t HL() const noexcept;
-  void SetHL(word_t value) noexcept;
-
-  std::ostream& PrettyDumpRegisters(std::ostream& os) const;
-  std::ostream& DumpRegisters(std::ostream& os) const;
-
+// Should I use std::align and should I use std::launder??
+// std::align isn't right as alignof has helped with that (I think)
+// although I guess it's still dodgy to use reinterpret_cast if one were to put
+// an int at the third byte (wouldn't be aligned anymore right??) I guess I
+// could place it a byte at a time? Maybe?
+//
+// Is it poorly/not portable.
+//
+// For now I shall not, additionally (asper isocpp's guide) I'm probably trying
+// to be too cleaver by using an array (for locallity?) but none the less
+//
+// Because it's so unlikly, we won't bother with mixed endian systems.
+// Additionally we're going to assume all integrals are the same endianness as
+// it's only on niche machines that we would have to worry about such things, so
+// testing will be important.
+//
+template <int BufferByteSize, decltype(alignof(nullptr_t)) Alignment>
+class RegisterSet {
  private:
-  using buffer_type = std::uint_fast8_t;
+  // unsigned char used as alignof = 1 always and is used over std::byte as
+  // std::byte is not an integral type
+  alignas(Alignment) std::array<unsigned char, BufferByteSize> raw_register_buffer_;
 
-  // Forward declare private enums. I should probably leave it as int but ....
-  enum class R8Bit : int_fast8_t;
-  enum class R16Bit : std::underlying_type_t<R8Bit>;
-  enum class RComposite : std::underlying_type_t<R8Bit>;
+ public:
+  using index_type = decltype(sizeof(nullptr_t));
 
-  static constexpr int kRegistersBufferSize = 12;
+  static RegisterSet InitalizedRegisterSet(unsigned char init = 0x00) {
+    RegisterSet rs;
+    rs.raw_register_buffer_.fill(init);
+    return rs;
+  }
 
-  byte_t Get8Bit(R8Bit offset) const noexcept;
-  byte_t& Get8Bit(R8Bit offset) noexcept;
+  RegisterSet() = default;
 
-  word_t Get16Bit(R16Bit offset) const noexcept;
-  word_t& Get16Bit(R16Bit offset) noexcept;
+  template <std::integral T>
+  T Get(int byte_offset) const noexcept {
+    const unsigned char* const ptr =
+        this->raw_register_buffer_.data() + byte_offset;
+    return *(reinterpret_cast<const T* const>(ptr));
+  }
 
-  word_t GetComposite(RComposite offset) const noexcept;
-  void SetComposite(RComposite offset, word_t value) noexcept;
+  template <std::integral T>
+  T& Get(int byte_offset) noexcept {
+    unsigned char* const ptr = this->raw_register_buffer_.data() + byte_offset;
+    return *(reinterpret_cast<T* const>(ptr));
+  }
 
-  // Alignment assures we can cast to pointers of byte_t and word_t
-  alignas(byte_t) alignas(word_t) alignas(buffer_type)
-      std::array<buffer_type, kRegistersBufferSize> raw_register_buffer_;
-};
+  // Must be a nicer way to do this!
 
-enum class Flags : byte_t {
-  Z = (1 << 7),
-  N = (1 << 6),
-  H = (1 << 5),
-  C = (1 << 4)
+  // GetComposite functions may require pointer to store value (C style)
+  // Not the neatest solution (should probably take a shift parameter but....
+  // this is bespoke enough for me so..... I mean this isnt a library (I mean..)
+  template <std::integral T, std::integral U>
+  T GetComposite(int higher_byte_offset, int lower_byte_offset) const noexcept {
+    const U higher_value = Get<U>(higher_byte_offset);
+    const U lower_value = Get<U>(lower_byte_offset);
+
+    return (static_cast<T>(higher_value) << (sizeof(U) * CHAR_BIT)) |
+           lower_value;
+  }
+
+  template <std::integral T, std::integral U>
+  T GetComposite(int higher_byte_offset) const noexcept {
+    if constexpr (std::endian::native == std::endian::big) {
+      // Dangerous if higher_byte_offset in range [arr.size() - sizeof(T),
+      // arr.size()) <- range syntax
+      return GetComposite<T, U>(higher_byte_offset,
+                                higher_byte_offset + sizeof(U));
+    } else if constexpr (std::endian::native == std::endian::little) {
+      // Dangerous if higher_byte_offset in range [ 0, sizeof(T) ) <- range
+      // syntax
+      return GetComposite<T, U>(higher_byte_offset,
+                                higher_byte_offset - sizeof(U));
+    } else {
+      static_assert(
+          false,
+          "Mixed endian systems are not (potentially currently) supported.");
+    }
+  }
+
+  template <std::integral T>
+  void SetComposite(int higher_byte_offset, int lower_byte_offset,
+                    T value) const noexcept;
+
+  template <std::integral T>
+  void SetComposite(int higher_byte_offset, T value) const noexcept;
+
+  friend std::ostream& operator<<(std::ostream& os, const RegisterSet& obj) {
+    os << "0x";
+    for (const unsigned char& b : obj.raw_register_buffer_) {
+      os << std::format("{:02x}", to_underlying(b));
+    }
+    return os;
+  }
 };
 
 }  // namespace tanukigb
-
 #endif
