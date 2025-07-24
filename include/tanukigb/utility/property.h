@@ -5,6 +5,14 @@
 #include <functional>
 #include <type_traits>
 
+//TODO: still crazily over complicated, I like the Functionoid design but
+// I've gotta calm it down with templates, I dont think 4*sizeof(pointer is unreasonable)
+// its certainly better than massive template args (or is it???)
+// Since these types are used in a throw away context (no sharing of each instantiation)
+// the drawbacks may not be so bad, a typedef would certainly make it nicer!
+// I hate all the member function ptr typedefs tho, horrible.
+
+
 namespace tanukigb {
 
 namespace {
@@ -53,49 +61,41 @@ using move_assign_member_function_ptr_t =
 
 }  // namespace
 
-// Although it is theoretically possible to have a property with no getter
-// it's such a corner case it's better to force setting of getter to nullptr
-// manually
-//
-// Is forcing the getter to be const good?
-//
-// Could remove need to hold reference to ContainingClass by taking it as a
-// param but as we want this to be syntatic sugar (and it could be exploited)
-// its better not to.
-//
+// Will lead to code bloat but reduce the size of each class from 4*sizeof(ptr)
+// to 1*sizeof(ptr)
 template <
     typename T, typename ContainingClass,
     const_member_function_ptr_t<T, ContainingClass> Getter,
     copy_assign_member_function_ptr_t<T, ContainingClass> CopySetter = nullptr,
     move_assign_member_function_ptr_t<T, ContainingClass> MoveSetter = nullptr>
-class Property {
- private:
+class MemberPtrFunctionoid {
+  private:
   using non_reference = std::remove_reference_t<T>;
   using reference = std::add_lvalue_reference_t<T>;
   using rvalue_reference = std::add_rvalue_reference_t<non_reference>;
 
  public:
-  Property(ContainingClass& container) : container_{container} {}
-  ~Property() = default;
+  MemberPtrFunctionoid(ContainingClass& container) : container_{container} {}
+  ~MemberPtrFunctionoid() = default;
 
-  Property(const Property&) = delete;
-  Property(Property&&) = delete;
+  MemberPtrFunctionoid(const MemberPtrFunctionoid&) = delete;
+  MemberPtrFunctionoid(MemberPtrFunctionoid&&) = delete;
 
-  operator T() {
+  T operator()() {
     static_assert(Getter != nullptr,
                   "Cannot call deleted Conversion (T()) AKA No getter set."
                   " If this is required, pass a Getter template parameter");
     return (container_.*Getter)();
   }
 
-  reference operator=(const reference rhs) {
+  reference operator()(const reference rhs) {
     static_assert(CopySetter != nullptr,
                   "Cannot call deleted copy asignment (T& operator=(const T&))."
                   " If this is required, pass a CopySetter template parameter");
     return (container_.*CopySetter)(rhs);
   }
 
-  reference operator=(rvalue_reference rhs) {
+  reference operator()(rvalue_reference rhs) {
     static_assert(MoveSetter != nullptr,
                   "Cannot call deleted move asignment (T& operator=(T&&))."
                   " If this is required, pass a MoveSetter template parameter");
@@ -104,6 +104,61 @@ class Property {
 
  private:
   ContainingClass& container_;
+};
+
+// Would like to make PropertyFunctionoid into a concept but I cant workout how
+// (sans making it be able to do at least one of the operations). However,
+// static asserts handle this quite nicely.
+//
+template <typename T, typename PropertyFunctionoid>
+class Property {
+ private:
+  using non_reference = std::remove_reference_t<T>;
+  using reference = std::add_lvalue_reference_t<T>;
+  using rvalue_reference = std::add_rvalue_reference_t<non_reference>;
+
+ public:
+  using property_type = non_reference;
+
+  Property(PropertyFunctionoid&& functionoid)
+      : functionoid_{std::move(functionoid)} {}
+  ~Property() = default;
+
+  Property(const Property&) = delete;
+  Property(Property&&) = delete;
+
+  operator T() {
+    static_assert(std::is_invocable_r_v<property_type, PropertyFunctionoid>,
+                  "Cannot call deleted Conversion (T()). If this is "
+                  "required, the functionoid must define T "
+                  "operator()().");
+
+    return functionoid_();
+  }
+
+  reference operator=(const reference rhs) {
+    static_assert(
+        std::is_invocable_r_v<property_type, PropertyFunctionoid,
+                              const reference>,
+        "Cannot call deleted copy asignment (T& operator=(const T&))."
+        " If this is required, the functionoid must define T& operator()(const "
+        "T&).");
+
+    return functionoid_(rhs);
+  }
+
+  reference operator=(rvalue_reference rhs) {
+    static_assert(std::is_invocable_r_v<property_type, PropertyFunctionoid,
+                                        const reference>,
+                  "Cannot call deleted move asignment (T& operator=(T&&))."
+                  " If this is required, the functionoid must define T& "
+                  "operator()(T&&).");
+
+    return functionoid_(std::move(rhs));
+  }
+
+ private:
+  PropertyFunctionoid functionoid_;
 };
 
 template <typename T, bool ReadOnly = false>
