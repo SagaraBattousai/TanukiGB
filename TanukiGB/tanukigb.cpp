@@ -1,10 +1,11 @@
 #include <tanukigb/cpu/cpu.h>
+#include <tanukigb/cpu/register_set.h>
 #include <tanukigb/memory/bootrom.h>
 #include <tanukigb/types/types.h>
-#include <tanukigb/utility/property.h>
-#include <tanukigb/cpu/register_set.h>
+#include <tanukigb/cpu/register.h>
 
 #include <array>
+#include<cstring>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
@@ -14,6 +15,8 @@
 #include <memory>
 #include <tuple>
 #include <type_traits>
+#include <bit>
+#include <span>
 
 using tanukigb::byte_t;
 using tanukigb::word_t;
@@ -45,25 +48,22 @@ void RunGameBoy(tanukigb::Cpu& cpu) {
 }
 */
 
-// using MFP = int&(Foo::*)(int&& v);
+template<typename T, typename F, F v>
+class Foo {
+
+};
 
 int main() {
   tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
   // RunGameBoy(cpu);
   // cpu.PrettyDumpRegisters(std::cout);
 
-  auto rs = tanukigb::RegisterSet<12, alignof(int)>::InitalizedRegisterSet();
+  Foo<int, double, 2.7> a;
+  Foo<int, double, 3.14> b;
 
-  std::cout << rs << std::endl;
+  std::cout << std::boolalpha
+            << std::is_same_v<decltype(a), decltype(b)> << std::endl;
 
-  rs.Get<unsigned char>(3) = 0xAB;
-  rs.Get<unsigned char>(4) = 0xCD;
-
-  std::cout << rs << std::endl;
-
-  short x = rs.GetComposite<short, unsigned char>(3); //0); //3,4); //, 4);
-
-  std::cout << std::hex << "0x" << x << std::endl;
-
+  
   return 0;
 }

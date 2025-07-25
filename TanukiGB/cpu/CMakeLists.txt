@@ -3,7 +3,11 @@ set(cpu_MODULE_ROOT "${MODULE_ROOT}/TanukiGB/cpu")
 set(cpp_sources "cpu.cpp" "register_set.cpp")
 
 set(c_sources "")
-set(cpu_module "${cpu_MODULE_ROOT}/cpu.h" "${cpu_MODULE_ROOT}/register_set.h")
+set(cpu_module 
+  "${cpu_MODULE_ROOT}/cpu.h" 
+  "${cpu_MODULE_ROOT}/register.h"
+  "${cpu_MODULE_ROOT}/register_set.h"
+  )
 
 set(cpu_private_module "opcode_handler.h")
 
