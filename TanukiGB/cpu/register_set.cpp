@@ -3,11 +3,41 @@
 
 namespace tanukigb {
 
+RegisterSet::RegisterSet()
+    : register_buffer_{},
+      // TODO: make neater/use constants to remove majic numbers
+      A{ByteRegisterFnoid{register_buffer_.data() + EndianOffset<0, 1>()}},
+      F{ByteRegisterFnoid{register_buffer_.data() + EndianOffset<1, 0>()}},
 
+      B{ByteRegisterFnoid{register_buffer_.data() + EndianOffset<2, 3>()}},
+      C{ByteRegisterFnoid{register_buffer_.data() + EndianOffset<3, 2>()}},
 
+      D{ByteRegisterFnoid{register_buffer_.data() + EndianOffset<4, 5>()}},
+      E{ByteRegisterFnoid{register_buffer_.data() + EndianOffset<5, 4>()}},
 
+      H{ByteRegisterFnoid{register_buffer_.data() + EndianOffset<6, 7>()}},
+      L{ByteRegisterFnoid{register_buffer_.data() + EndianOffset<7, 6>()}},
 
-std::ostream& RegisterSet::PrettyDumpRegisters(std::ostream& os) const {
+      SP{WordRegisterFnoid{register_buffer_.data() + 8}},
+      PC{WordRegisterFnoid{register_buffer_.data() + 10}},
+
+      BC{WordRegisterFnoid{register_buffer_.data() + 2}},
+      DE{WordRegisterFnoid{register_buffer_.data() + 4}},
+      HL{WordRegisterFnoid{register_buffer_.data() + 6}} {}
+
+// Could do one where we also print the composite registers (although they're "fake")
+std::ostream& PrettyPrintRegisters(std::ostream& os, const RegisterSet& rs) {
+  os << "A: " << rs.A
+     << "\tF: " << rs.F
+     << "\nB: " << rs.B
+     << "\tC: " << rs.C
+     << "\nD: " << rs.D
+     << "\tE: " << rs.E
+     << "\nH: " << rs.H
+     << "\tL: " << rs.L
+     << "\nSP: " << rs.SP
+     << "\nPC: " << rs.PC
+     << std::endl;
   return os;
 }
 

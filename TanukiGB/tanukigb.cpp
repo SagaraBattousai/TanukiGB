@@ -1,22 +1,11 @@
-#include <tanukigb/cpu/cpu.h>
-#include <tanukigb/cpu/register_set.h>
-#include <tanukigb/memory/bootrom.h>
-#include <tanukigb/types/types.h>
-#include <tanukigb/cpu/register.h>
 
 #include <array>
-#include<cstring>
-#include <concepts>
-#include <cstddef>
-#include <cstdint>
-#include <format>
-#include <functional>
 #include <iostream>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <bit>
-#include <span>
+
+#include <tanukigb/cpu/cpu.h>
+#include <tanukigb/cpu/register_set.h>
+#include <tanukigb/types/types.h>
+
 
 using tanukigb::byte_t;
 using tanukigb::word_t;
@@ -48,22 +37,28 @@ void RunGameBoy(tanukigb::Cpu& cpu) {
 }
 */
 
-template<typename T, typename F, F v>
-class Foo {
-
-};
-
 int main() {
   tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
   // RunGameBoy(cpu);
   // cpu.PrettyDumpRegisters(std::cout);
 
-  Foo<int, double, 2.7> a;
-  Foo<int, double, 3.14> b;
+  tanukigb::RegisterSet rs{};
 
-  std::cout << std::boolalpha
-            << std::is_same_v<decltype(a), decltype(b)> << std::endl;
+  std::cout << rs << std::endl;
 
-  
+  tanukigb::PrettyPrintRegisters(std::cout, rs);
+
+  rs.C = 0xAB;
+
+  std::cout << rs << std::endl;
+
+  tanukigb::PrettyPrintRegisters(std::cout, rs);
+
+  rs.HL = 0xDEAD;
+
+  std::cout << rs << std::endl;
+
+  tanukigb::PrettyPrintRegisters(std::cout, rs);
+
   return 0;
 }

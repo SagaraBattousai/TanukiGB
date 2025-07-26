@@ -2,55 +2,67 @@
 #define __TANUKIGB_CPU_REGISTER_H__
 
 #include <concepts>
-#include <utility>
 #include <format>
 #include <ostream>
+#include <utility>
 
 namespace tanukigb {
 
 namespace {
 constexpr auto kHexCharsPerByte = 2;
-}
 
-// May need a Register private base to remove code bloat
-// Don't want offset as a NTTP as A) it means we'd need to
-// template each function and a bunch of other things i just forgot (Thanks Halo
-// tv show)
+// Will this work with const functionoid? Ideally we'd have 1 functionoid (if
+// its larger than the size of a pointer) and then just store a reference to it
+// in each register which will allow us to reduce the size.
+// To completly reduce the size I suppose we could do it manually/use a bespoke
+// class but that would still take a reference (to the backing array) an offset
+// (int etc) Still this could be smaller so lets see if we can make a Register
+// functionoid take an args parameter pack for its various functions.
 //
-// Hard to decouble however without additional template parameters.
-// We want Registers of the same integral type (16 bit registers 8 bit registers
-// etc to be the "same type" passing a functionoid will be difficult without
-// templates making them each distinct types but if we coulple them to the
-// register set class then... not great!
-// Actually if they take the same functionoid its okay so...
+// Cant return by ref since memset and bit_cast dont return by ref, however as these are integrals its alright
+template <typename Fnoid, typename Integral>
+concept RegisterFunctionoid =
+    std::is_integral_v<Integral> && requires(Fnoid fnoid, Integral value) {
+      { fnoid() } -> std::same_as<Integral>;
+      // VV Requires either by value call operator or by lref (and optionally by
+      // rref)
+      { fnoid(value) } -> std::same_as<Integral>;
+    };
 
-template <std::integral T, typename Functionoid>
+}  // namespace
+
+// Ive literally just forgotten how i was planning on passing the args without
+// holding them :P
+template <std::integral T, RegisterFunctionoid<T> Functionoid>
 class Register {
  public:
-   //For now
-  Register(T init) : value_{init} {}
+  explicit Register(Functionoid fnoid) : fnoid_{fnoid} {}
+  ~Register() = default;
 
-  // Could just pass by value as it's less duplication but in this case its not
-  // a big deal
-  T& operator=(const T&);
-  T& operator=(T&&);
+  Register(const Register&) = delete;
+  Register(Register&&) = delete;
 
-  //For now
-  operator T() const { return value_; }
-  //For now
-  operator T&() { return value_; }
+  // No need to have const lvalue ref and rvalue ref as T is scalar (integral)
+  // Cant return by ref since memset and bit_cast dont return by ref, however as
+  // these are integrals its alright
+  T operator=(T value) { return fnoid_(value); }
 
+  // Cant return by ref since memset and bit_cast dont return by ref, however as
+  // these are integrals its alright
+  operator T() const { return fnoid_(); }
 
-  friend std::ostream& operator<<(std::ostream& os, const Register& obj) {
-    os << std::format("{:#0{}x}", obj.GetValue(),
-                      (1 + sizeof(T)) * kHexCharsPerByte);
-    return os;
-  }
-
-  private:
-  // For now
-  T value_;
+ private:
+  Functionoid& fnoid_;
 };
+
+// Doesn't even need to be a friend :D
+template <std::integral T, RegisterFunctionoid<T> Functionoid>
+std::ostream& operator<<(std::ostream& os,
+                         const Register<T, Functionoid>& obj) {
+  os << std::format("{:#0{}x}", obj.fnoid(),
+                    (1 + sizeof(T)) * kHexCharsPerByte);
+  return os;
+}
 
 }  // namespace tanukigb
 #endif
