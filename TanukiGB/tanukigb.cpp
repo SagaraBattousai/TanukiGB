@@ -1,11 +1,10 @@
 
-#include <array>
-#include <iostream>
-
 #include <tanukigb/cpu/cpu.h>
 #include <tanukigb/cpu/register_set.h>
 #include <tanukigb/types/types.h>
 
+#include <array>
+#include <iostream>
 
 using tanukigb::byte_t;
 using tanukigb::word_t;

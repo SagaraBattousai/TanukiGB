@@ -52,14 +52,14 @@ class Register {
   operator T() const { return fnoid_(); }
 
  private:
-  Functionoid& fnoid_;
+  Functionoid fnoid_;
 };
 
 // Doesn't even need to be a friend :D
 template <std::integral T, RegisterFunctionoid<T> Functionoid>
 std::ostream& operator<<(std::ostream& os,
                          const Register<T, Functionoid>& obj) {
-  os << std::format("{:#0{}x}", obj.fnoid(),
+  os << std::format("{:#0{}x}", obj.operator T(),
                     (1 + sizeof(T)) * kHexCharsPerByte);
   return os;
 }

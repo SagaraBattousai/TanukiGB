@@ -13,39 +13,39 @@ class RegisterSetFnoid {};
 template <std::integral T>
 class RegisterSetFnoid<T, true> {
  public:
-  explicit RegisterSetFnoid(unsigned char* const buff_ref)
-      : buff_ref_{buff_ref} {}
+  explicit RegisterSetFnoid(unsigned char* const buff_ptr)
+      : buff_ptr_{buff_ptr} {}
 
-  T operator()() const { return *(reinterpret_cast<T* const>(buff_ref_)); }
+  T operator()() const { return *(reinterpret_cast<T* const>(buff_ptr_)); }
 
   T operator()(T value) { 
-    *(reinterpret_cast<T* const>(buff_ref_)) = value; 
+    *(reinterpret_cast<T* const>(buff_ptr_)) = value; 
     return value;
   }
 
  private:
-  unsigned char* const buff_ref_;
+  unsigned char* const buff_ptr_;
 };
 
 template <std::integral T>
 class RegisterSetFnoid<T, false> {
  public:
-  explicit RegisterSetFnoid(unsigned char* const buff_ref)
-      : buff_ref_{buff_ref} {}
+  explicit RegisterSetFnoid(unsigned char* const buff_ptr)
+      : buff_ptr_{buff_ptr} {}
 
   T operator()() const {
     T ret{};
-    std::memcpy(&ret, buff_ref_, sizeof(T));
+    std::memcpy(&ret, buff_ptr_, sizeof(T));
     return ret;
   }
 
   T operator()(T value) {
-    std::memcpy(buff_ref_, &value, sizeof(T));
+    std::memcpy(buff_ptr_, &value, sizeof(T));
     return value;
   }
 
  private:
-  unsigned char* const buff_ref_;
+  unsigned char* const buff_ptr_;
 };
 
 }  // namespace tanukigb
