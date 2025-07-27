@@ -2,31 +2,63 @@
 #define __TANUKIGB_CPU_REGISTER_SET_H__
 
 #include <_TanukiGB_config.h>
+#include <tanukigb/cpu/register.h>
+#include <tanukigb/cpu/register_set_functionoid.h>
+#include <tanukigb/types/types.h>
 
 #include <array>
 #include <bit>
 #include <format>
 #include <ostream>
 
-#include <tanukigb/cpu/register.h>
-#include <tanukigb/cpu/register_set_functionoid.h>
-#include <tanukigb/types/types.h>
-
 namespace tanukigb {
 
-//#if defined(_WIN32) || defined(__CYGWIN__)
-//extern template class Register<byte_t, RegisterSetFnoid<byte_t, true>>;
-//#endif
+using rset_offset_type = std::array<int, 0>::size_type;
+
+template <rset_offset_type BigEndianOffset, rset_offset_type LittleEndianOffset>
+consteval rset_offset_type EndianOffset() {
+  if constexpr (std::endian::native == std::endian::big) {
+    return BigEndianOffset;
+  } else if constexpr (std::endian::native == std::endian::little) {
+    return LittleEndianOffset;
+  } else {
+    static_assert(
+        false,
+        "Mixed endian is (potentially currently) not supported. A per type "
+        "endianness check may soon be implemented if some types have different "
+        "endianness but niche byte layouts (e.g. using words instead of bytes "
+        "or odd ordering) is unlikely to be supported).");
+  }
+}
+
+// Using explicit template initilisation declaration (and definition in the
+// .cpp) reduces code bloat and removes msvc's warning about dll-interface
+// issues (C4251). However it does mean it's deadly if a client (and I know this
+// is supposed to be an application and we could separate the library parts from
+// the application parts) also has an explicit initilisation definition and I
+// don't know of a way to warn clients outside of documentation (and the fact
+// that they're declared here)
+
+// Do not use explicitly template initalisation definite the following (byte_t
+// defined in tanukigb/types/types.h as std::uint8_t)
+extern template class RegisterSetFnoid<byte_t, true>;
+extern template class Register<byte_t, RegisterSetFnoid<byte_t, true>>;
+
+// Do not use explicitly template initalisation definite the following (word_t
+// defined in tanukigb/types/types.h as std::uint16_t)
+extern template class RegisterSetFnoid<word_t, true>;
+extern template class Register<word_t, RegisterSetFnoid<word_t, true>>;
 
 class TANUKIGB_EXPORT RegisterSet {
  private:
-  // Makes constructor neater
+  // explicit template initilisation declaration above (definition in
+  // corresponding .cpp file)
   using ByteRegisterFnoid = RegisterSetFnoid<byte_t, true>;
-  //using ByteRegisterFnoid = RegisterSetFnoid<byte_t, false>;
   using ByteRegister = Register<byte_t, ByteRegisterFnoid>;
 
+  // explicit template initilisation declaration above (definition in
+  // corresponding .cpp file)
   using WordRegisterFnoid = RegisterSetFnoid<word_t, true>;
-  //using WordRegisterFnoid = RegisterSetFnoid<word_t, false>;
   using WordRegister = Register<word_t, WordRegisterFnoid>;
 
  public:
@@ -81,7 +113,7 @@ class TANUKIGB_EXPORT RegisterSet {
 };
 
 TANUKIGB_EXPORT std::ostream& PrettyPrintRegisters(std::ostream& os,
-                                                  const RegisterSet& rs);
+                                                   const RegisterSet& rs);
 
 }  // namespace tanukigb
 #endif
