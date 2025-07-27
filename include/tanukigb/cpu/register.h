@@ -8,8 +8,9 @@
 
 namespace tanukigb {
 
-namespace {
+namespace internal {
 constexpr auto kHexCharsPerByte = 2;
+}  // namespace internal
 
 // Will this work with const functionoid? Ideally we'd have 1 functionoid (if
 // its larger than the size of a pointer) and then just store a reference to it
@@ -19,7 +20,8 @@ constexpr auto kHexCharsPerByte = 2;
 // (int etc) Still this could be smaller so lets see if we can make a Register
 // functionoid take an args parameter pack for its various functions.
 //
-// Cant return by ref since memset and bit_cast dont return by ref, however as these are integrals its alright
+// Cant return by ref since memset and bit_cast dont return by ref, however as
+// these are integrals its alright
 template <typename Fnoid, typename Integral>
 concept RegisterFunctionoid =
     std::is_integral_v<Integral> && requires(Fnoid fnoid, Integral value) {
@@ -29,7 +31,6 @@ concept RegisterFunctionoid =
       { fnoid(value) } -> std::same_as<Integral>;
     };
 
-}  // namespace
 
 // Ive literally just forgotten how i was planning on passing the args without
 // holding them :P
@@ -60,7 +61,7 @@ template <std::integral T, RegisterFunctionoid<T> Functionoid>
 std::ostream& operator<<(std::ostream& os,
                          const Register<T, Functionoid>& obj) {
   os << std::format("{:#0{}x}", obj.operator T(),
-                    (1 + sizeof(T)) * kHexCharsPerByte);
+                    (1 + sizeof(T)) * internal::kHexCharsPerByte);
   return os;
 }
 

@@ -3,30 +3,14 @@
 
 namespace tanukigb {
 
-//#if defined(_WIN32) || defined(__CYGWIN__)
 //template class TANUKIGB_EXPORT Register<byte_t, RegisterSetFnoid<byte_t, true>>;
-//#endif
+template class TANUKIGB_EXPORT RegisterSetFnoid<byte_t, true>;
+template class TANUKIGB_EXPORT Register<byte_t, RegisterSetFnoid<byte_t, true>>;
 
-namespace {
-using array_size_type = std::array<int, 0>::size_type;
-
-// Is this allowed to be in the annonmous namespace
-template <array_size_type BigEndianOffset, array_size_type LittleEndianOffset>
-consteval array_size_type EndianOffset() {
-  if constexpr (std::endian::native == std::endian::big) {
-    return BigEndianOffset;
-  } else if constexpr (std::endian::native == std::endian::little) {
-    return LittleEndianOffset;
-  } else {
-    static_assert(
-        false,
-        "Mixed endian is (potentially currently) not supported. A per type "
-        "endianness check may soon be implemented if some types have different "
-        "endianness but niche byte layouts (e.g. using words instead of bytes "
-        "or odd ordering) is unlikely to be supported).");
-  }
-}
-}  // namespace
+// Do not use explicitly template initalisation definite the following (word_t
+// defined in tanukigb/types/types.h as std::uint16_t)
+template class TANUKIGB_EXPORT RegisterSetFnoid<word_t, true>;
+template class TANUKIGB_EXPORT Register<word_t, RegisterSetFnoid<word_t, true>>;
 
 RegisterSet::RegisterSet()
     : register_buffer_{},
