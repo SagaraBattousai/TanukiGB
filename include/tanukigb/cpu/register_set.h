@@ -41,30 +41,31 @@ consteval rset_offset_type EndianOffset() {
 
 // Do not use explicitly template initalisation definite the following (byte_t
 // defined in tanukigb/types/types.h as std::uint8_t)
-extern template class RegisterSetFnoid<byte_t, true>;
-extern template class Register<byte_t, RegisterSetFnoid<byte_t, true>>;
+extern template class RegisterSetFnoid<byte_t>;
+extern template class Register<byte_t, RegisterSetFnoid<byte_t>>;
 
 // Do not use explicitly template initalisation definite the following (word_t
 // defined in tanukigb/types/types.h as std::uint16_t)
-extern template class RegisterSetFnoid<word_t, true>;
-extern template class Register<word_t, RegisterSetFnoid<word_t, true>>;
+extern template class RegisterSetFnoid<word_t>;
+extern template class Register<word_t, RegisterSetFnoid<word_t>>;
 
-class TANUKIGB_EXPORT RegisterSet {
+class RegisterSet {
  private:
   // explicit template initilisation declaration above (definition in
   // corresponding .cpp file)
-  using ByteRegisterFnoid = RegisterSetFnoid<byte_t, true>;
+  using ByteRegisterFnoid = RegisterSetFnoid<byte_t>;
   using ByteRegister = Register<byte_t, ByteRegisterFnoid>;
 
   // explicit template initilisation declaration above (definition in
   // corresponding .cpp file)
-  using WordRegisterFnoid = RegisterSetFnoid<word_t, true>;
+  using WordRegisterFnoid = RegisterSetFnoid<word_t>;
   using WordRegister = Register<word_t, WordRegisterFnoid>;
 
  public:
-  RegisterSet();
+  TANUKIGB_EXPORT RegisterSet();
 
-  static RegisterSet InitalizedRegisterSet(unsigned char init = 0x00) {
+  static TANUKIGB_EXPORT RegisterSet
+  InitalizedRegisterSet(unsigned char init = 0x00) {
     return RegisterSet(init);
   }
 
@@ -90,7 +91,8 @@ class TANUKIGB_EXPORT RegisterSet {
 
   // No such "definitive" way to print so should use named functions but it's
   // easier to just have the simple print (RegisterDump) be operator<<
-  friend std::ostream& operator<<(std::ostream& os, const RegisterSet& obj) {
+  friend TANUKIGB_EXPORT std::ostream& operator<<(std::ostream& os,
+                                                  const RegisterSet& obj) {
     os << "0x";
     for (const unsigned char& b : obj.register_buffer_) {
       os << std::format("{:02x}", b);
@@ -101,12 +103,9 @@ class TANUKIGB_EXPORT RegisterSet {
  private:
   constexpr static int kRegisterSetBufferBytes = 12;
   using buffer_type = std::array<unsigned char, kRegisterSetBufferBytes>;
+  // No longer needs to be aligned as we're now using memcpy
+  buffer_type register_buffer_;
 
-  alignas(word_t) buffer_type register_buffer_;
-
-  // nrvo isnt enforced by C++20 and wont work in some builds so using private
-  // constructor. This one is to only be called named constructor:
-  // InitalizedRegisterSet
   explicit RegisterSet(unsigned char init) : RegisterSet() {
     register_buffer_.fill(init);
   }

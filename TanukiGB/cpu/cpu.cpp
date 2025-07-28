@@ -1,15 +1,15 @@
+#include <ostream>
+
 #include <tanukigb/cpu/cpu.h>
 #include <tanukigb/memory/mmu.h>
 #include <tanukigb/types/types.h>
-
-#include <ostream>
-
-// #include <tanukigb/cpu/register_set.h>
+#include <tanukigb/cpu/register_set.h>
 
 namespace tanukigb {
 
 /////////////////////////////////////////////////////////
 
+/*
 enum class Flag : byte_t {
   Z = (1 << 7),
   N = (1 << 6),
@@ -17,30 +17,7 @@ enum class Flag : byte_t {
   C = (1 << 4)
 };
 
-/*
-public:
-  // Must be scoped as C and H are also function (register) names. Could call
-  // them _Flag but... Must be byte_t so it matches register type Bitmask
-  // functions implemented at end of header
 
-  // remove fill later as this wont always be the case
-
-  // Could make template but it would require the underlying type of the enum to
-  // be the return type for now.
-  //
-  // Return const scalars by value according to C++ ref (makes sence sepecially
-  // since all our values are
-  //  actually smaller than ptrs :P)
-  //
-  // Wish I could make these inline as they all call an internal/private
-  // function but that would require exposing the
-  //
-
-  byte_t A() const noexcept;
-  byte_t& A() noexcept;
-
-  byte_t F() const noexcept;
-  byte_t& F() noexcept;
 
   byte_t GetFlags() const noexcept { return F(); }
   void SetFlags(Flag flags) noexcept { F() |= flags; }
@@ -52,46 +29,7 @@ public:
   bool IsHFlagSet() const noexcept { return (F() & Flag::H) != 0; }
   bool IsCFlagSet() const noexcept { return (F() & Flag::C) != 0; }
 
-  byte_t B() const noexcept;
-  byte_t& B() noexcept;
-
-  byte_t C() const noexcept;
-  byte_t& C() noexcept;
-
-  byte_t D() const noexcept;
-  byte_t& D() noexcept;
-
-  byte_t E() const noexcept;
-  byte_t& E() noexcept;
-
-  byte_t H() const noexcept;
-  byte_t& H() noexcept;
-
-  byte_t L() const noexcept;
-  byte_t& L() noexcept;
-
-  word_t SP() const noexcept;
-  word_t& SP() noexcept;
-
-  word_t PC() const noexcept;
-  word_t& PC() noexcept;
-
-  word_t AF() const noexcept;
-  void SetAF(word_t value) noexcept;
-
-  word_t BC() const noexcept;
-  void SetBC(word_t value) noexcept;
-
-  word_t DE() const noexcept;
-  void SetDE(word_t value) noexcept;
-
-  word_t HL() const noexcept;
-  void SetHL(word_t value) noexcept;
-
-  std::ostream& PrettyDumpRegisters(std::ostream& os) const;
-*/
-
-///////////////////////////////////////////////////////
+ */
 
 class Cpu::CpuImpl {
  public:
@@ -99,13 +37,7 @@ class Cpu::CpuImpl {
 
   int Run();
 
-  /*
-  byte_t A() const noexcept;
-  byte_t& A() noexcept;
-
-  byte_t F() const noexcept;
-  byte_t& F() noexcept;
-
+ /*
   byte_t GetFlags() const noexcept { return F(); }
   void SetFlags(Flag flags) noexcept { F() |= flags; }
   void ClearFlags(Flag flags) noexcept { F() &= ~flags; }
@@ -116,53 +48,16 @@ class Cpu::CpuImpl {
   bool IsHFlagSet() const noexcept { return (F() & Flag::H) != 0; }
   bool IsCFlagSet() const noexcept { return (F() & Flag::C) != 0; }
 
-  byte_t B() const noexcept;
-  byte_t& B() noexcept;
-
-  byte_t C() const noexcept;
-  byte_t& C() noexcept;
-
-  byte_t D() const noexcept;
-  byte_t& D() noexcept;
-
-  byte_t E() const noexcept;
-  byte_t& E() noexcept;
-
-  byte_t H() const noexcept;
-  byte_t& H() noexcept;
-
-  byte_t L() const noexcept;
-  byte_t& L() noexcept;
-
-  word_t SP() const noexcept;
-  word_t& SP() noexcept;
-
-  word_t PC() const noexcept;
-  word_t& PC() noexcept;
-
-  word_t AF() const noexcept;
-  void SetAF(word_t value) noexcept;
-
-  word_t BC() const noexcept;
-  void SetBC(word_t value) noexcept;
-
-  word_t DE() const noexcept;
-  void SetDE(word_t value) noexcept;
-
-  word_t HL() const noexcept;
-  void SetHL(word_t value) noexcept;
-
   */
 
-  /*
-  std::ostream& DumpRegisters(std::ostream& os) const {
-    return registers_.DumpRegisters(os);
+  
+  inline std::ostream& PrintRegisters(std::ostream& os) const {
+    return (os << registers_);
   }
 
-  std::ostream& PrettyDumpRegisters(std::ostream& os) const {
-    return registers_.PrettyDumpRegisters(os);
+  inline std::ostream& PrettyPrintRegisters(std::ostream& os) const {
+    return tanukigb::PrettyPrintRegisters(os, registers_);
   }
-  */
 
  private:
   template <typename T>
@@ -172,7 +67,7 @@ class Cpu::CpuImpl {
   using OpcodeHandlerFuncPtr = void (*)(T&);
 
   MMU mmu_;
-  // RegisterSet registers_;
+  RegisterSet registers_;
 };
 
 Cpu::Cpu(Pimpl<CpuImpl>&& impl) : impl_(std::move(impl)) {}
@@ -183,27 +78,28 @@ Cpu& Cpu::operator=(Cpu&&) = default;
 
 Cpu Cpu::GameboyCpu() { return Cpu(Pimpl<CpuImpl>(MMU::GameboyMMU())); }
 Cpu Cpu::ColourGameboyCpu() { return Cpu(MMU::ColourGameboyMMU()); }
-/*
 
 int Cpu::Run() { return impl_->Run(); }
 
-std::ostream& Cpu::DumpRegisters(std::ostream& os) const {
-  return impl_->DumpRegisters(os);
+inline std::ostream& Cpu::PrintRegisters(std::ostream& os) const {
+  return impl_->PrintRegisters(os);
 }
-std::ostream& Cpu::PrettyDumpRegisters(std::ostream& os) const {
-  return impl_->PrettyDumpRegisters(os);
+
+inline std::ostream& Cpu::PrettyPrintRegisters(std::ostream& os) const {
+  return impl_->PrettyPrintRegisters(os);
 }
 
 
 int Cpu::CpuImpl::Run() {
+  /*
   while (true) {
-    byte_t opcode = mmu_.Read(registers_.PC());
+    byte_t opcode = mmu_.Read(registers_.PC);
     registers_.PC()++;
 
     switch (opcode) {
       case 0x31:
         // Todo: after MMU add helper as the postfix++ is mucky.
-        registers_.SP() =
+        registers_.SP =
             mmu_.Read(registers_.PC()++) | mmu_.Read(registers_.PC()++) << 8;
         // registers_.PC() += 2;
         break;
@@ -220,9 +116,9 @@ int Cpu::CpuImpl::Run() {
         return opcode;
     }
   }
+  */
 
   return 0;
 }
-*/
 
 }  // namespace tanukigb

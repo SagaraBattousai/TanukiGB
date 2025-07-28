@@ -4,7 +4,13 @@
 #include <tanukigb/types/types.h>
 
 #include <array>
+#include <bit>
+#include <chrono>
+#include <cstring>
 #include <iostream>
+#include <limits>
+#include <type_traits>
+#include <utility>
 
 using tanukigb::byte_t;
 using tanukigb::word_t;
@@ -36,6 +42,22 @@ void RunGameBoy(tanukigb::Cpu& cpu) {
 }
 */
 
+/*
+uint16_t read16(std::size_t index) const {
+  assert(index + 1 < kSize);
+  std::array<Byte, 2> temp = {data_[index], data_[index + 1]};
+  return std::bit_cast<uint16_t>(temp);  // Little-endian assumed
+}
+
+// Write a 16-bit value across two adjacent 8-bit registers
+void write16(std::size_t index, uint16_t value) {
+  assert(index + 1 < kSize);
+  std::array<Byte, 2> temp = std::bit_cast<std::array<Byte, 2>>(value);
+  data_[index] = temp[0];
+  data_[index + 1] = temp[1];
+}
+*/
+
 int main() {
   tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
   // RunGameBoy(cpu);
@@ -43,21 +65,11 @@ int main() {
 
   tanukigb::RegisterSet rs{};
 
-  std::cout << rs << std::endl;
+  rs.A = 7;
+  rs.B = 8;
+  rs.C = 7;
 
-  tanukigb::PrettyPrintRegisters(std::cout, rs);
-
-  rs.C = 0xAB;
-
-  std::cout << rs << std::endl;
-
-  tanukigb::PrettyPrintRegisters(std::cout, rs);
-
-  rs.HL = 0xDEAD;
-
-  std::cout << rs << std::endl;
-
-  tanukigb::PrettyPrintRegisters(std::cout, rs);
+  bool i = rs.A == rs.B;
 
   return 0;
 }

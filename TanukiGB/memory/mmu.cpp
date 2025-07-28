@@ -11,6 +11,7 @@ byte_t MMU::Read(word_t addr) const {
   } else {
     return psudo_ram_[addr]; //TODO
   }
+  return 0; //TODO
 }
 
 void MMU::Write(word_t addr, byte_t value) { psudo_ram_[addr] = value; }

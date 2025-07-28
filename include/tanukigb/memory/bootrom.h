@@ -9,19 +9,20 @@
 
 namespace tanukigb {
 
-// NOTE: For now We will only consider the OG Gameboy, We will implement the 
-// Colour one after not simultaniously, I don't yet possess the skill or understanding.
+// NOTE: For now We will only consider the OG Gameboy, We will implement the
+// Colour one after not simultaniously, I don't yet possess the skill or
+// understanding.
 
-class TANUKIGB_EXPORT Bootrom {  // Fulfils ROM
+class Bootrom {  // Fulfils ROM
  public:
-  static Bootrom GBRom();
-  static Bootrom CGBRom();
-
-  byte_t Read(word_t addr) const {
-    return rom_[addr];
-  }
-  
   const int rom_size_;  // explicitly set but should be same as rom_.size()
+
+  static TANUKIGB_EXPORT Bootrom GBRom();
+  static TANUKIGB_EXPORT Bootrom CGBRom();
+
+  // Do inline functions need exporting? Maybe if addr needed/to make ABI
+  // stable?
+  byte_t Read(word_t addr) const { return rom_[addr]; }
 
  private:
   Bootrom(std::vector<byte_t>&& rom, int rom_size)

@@ -6,40 +6,24 @@
 #include <cstring>
 
 namespace tanukigb {
-
-template <std::integral T, bool is_alignment_garunteed>
-class RegisterSetFnoid {};
-
+// Although reinterpret cast is "technically" safe when our buffer was aligned
+// on the off chance std::uint8_t wasnt unsigned char (or the compiler
+// disallowed it for strict aliasing memcpy is just safer (and faster than
+// bit_cast for pointer (unless the original source was local (too function, not
+// just "on" the stack)
 template <std::integral T>
-class RegisterSetFnoid<T, true> {
+class RegisterSetFnoid {
  public:
   explicit RegisterSetFnoid(unsigned char* const buff_ptr)
       : buff_ptr_{buff_ptr} {}
 
-  T operator()() const { return *(reinterpret_cast<T* const>(buff_ptr_)); }
-
-  T operator()(T value) { 
-    *(reinterpret_cast<T* const>(buff_ptr_)) = value; 
-    return value;
-  }
-
- private:
-  unsigned char* const buff_ptr_;
-};
-
-template <std::integral T>
-class RegisterSetFnoid<T, false> {
- public:
-  explicit RegisterSetFnoid(unsigned char* const buff_ptr)
-      : buff_ptr_{buff_ptr} {}
-
-  T operator()() const {
+  T operator()() const noexcept {
     T ret{};
     std::memcpy(&ret, buff_ptr_, sizeof(T));
     return ret;
   }
 
-  T operator()(T value) {
+  T operator()(T value) noexcept {
     std::memcpy(buff_ptr_, &value, sizeof(T));
     return value;
   }

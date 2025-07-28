@@ -6,6 +6,7 @@ set(c_sources "")
 set(cpu_module 
   "${cpu_MODULE_ROOT}/cpu.h" 
   "${cpu_MODULE_ROOT}/register.h"
+  "${cpu_MODULE_ROOT}/flag_register.h"
   "${cpu_MODULE_ROOT}/register_set.h"
   "${cpu_MODULE_ROOT}/register_set_functionoid.h"
   )

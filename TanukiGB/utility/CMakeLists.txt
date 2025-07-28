@@ -10,6 +10,7 @@ target_sources(utility PUBLIC
   BASE_DIRS ${MODULE_ROOT}
   FILES
     "${utility_MODULE_ROOT}/enum_utils.h"
+    "${utility_MODULE_ROOT}/integral.h"
     "${utility_MODULE_ROOT}/pimpl.h"
     # "${utility_MODULE_ROOT}/property.h"
   )

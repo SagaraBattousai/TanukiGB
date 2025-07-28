@@ -3,14 +3,15 @@
 
 namespace tanukigb {
 
-//template class TANUKIGB_EXPORT Register<byte_t, RegisterSetFnoid<byte_t, true>>;
-template class TANUKIGB_EXPORT RegisterSetFnoid<byte_t, true>;
-template class TANUKIGB_EXPORT Register<byte_t, RegisterSetFnoid<byte_t, true>>;
+// Do not use explicitly template initalisation definite the following (byte_t
+// defined in tanukigb/types/types.h as std::uint16_t)
+template class TANUKIGB_EXPORT RegisterSetFnoid<byte_t>;
+template class TANUKIGB_EXPORT Register<byte_t, RegisterSetFnoid<byte_t>>;
 
 // Do not use explicitly template initalisation definite the following (word_t
 // defined in tanukigb/types/types.h as std::uint16_t)
-template class TANUKIGB_EXPORT RegisterSetFnoid<word_t, true>;
-template class TANUKIGB_EXPORT Register<word_t, RegisterSetFnoid<word_t, true>>;
+template class TANUKIGB_EXPORT RegisterSetFnoid<word_t>;
+template class TANUKIGB_EXPORT Register<word_t, RegisterSetFnoid<word_t>>;
 
 RegisterSet::RegisterSet()
     : register_buffer_{},
