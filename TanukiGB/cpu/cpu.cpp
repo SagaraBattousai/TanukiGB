@@ -52,7 +52,7 @@ class Cpu::CpuImpl {
 
   
   inline std::ostream& PrintRegisters(std::ostream& os) const {
-    return (os << registers_);
+    return (os << registers_ << std::endl);
   }
 
   inline std::ostream& PrettyPrintRegisters(std::ostream& os) const {
@@ -91,32 +91,31 @@ inline std::ostream& Cpu::PrettyPrintRegisters(std::ostream& os) const {
 
 
 int Cpu::CpuImpl::Run() {
-  /*
   while (true) {
-    byte_t opcode = mmu_.Read(registers_.PC);
-    registers_.PC()++;
+    byte_t opcode = mmu_.Read(static_cast<word_t>(registers_.PC));
+    registers_.PC++;
 
     switch (opcode) {
       case 0x31:
         // Todo: after MMU add helper as the postfix++ is mucky.
         registers_.SP =
-            mmu_.Read(registers_.PC()++) | mmu_.Read(registers_.PC()++) << 8;
+            mmu_.Read(registers_.PC++) | mmu_.Read(registers_.PC++) << 8;
         // registers_.PC() += 2;
         break;
 
       case 0xAF:
         // XOR's A with A (i.e. zeros it) we will cheat and just do that untill
         // we write the inner functions later
-        registers_.A() = 0x00;
-        registers_.SetFlags(RegisterSet::Flag::Z);
-        registers_.ClearFlags(RegisterSet::Flag::N | RegisterSet::Flag::H |
-                              RegisterSet::Flag::C);
+        registers_.A = 0x00;
+        registers_.F = 0b1000'0000;
+        //registers_.SetFlags(RegisterSet::Flag::Z);
+        //registers_.ClearFlags(RegisterSet::Flag::N | RegisterSet::Flag::H |
+        //                      RegisterSet::Flag::C);
         break;
       default:
         return opcode;
     }
   }
-  */
 
   return 0;
 }

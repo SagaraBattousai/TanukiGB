@@ -31,45 +31,19 @@ std::ostream& operator<<(std::ostream& os, const std::array<T, Count>& arr) {
   return os;
 }
 
-/*
 void RunGameBoy(tanukigb::Cpu& cpu) {
   int ret = cpu.Run();
 
   if (ret != 0) {
     std::cout << std::format("Unknown Opcode: {:#02x}\n", ret);
-    cpu.DumpRegisters(std::cout);
+    cpu.PrintRegisters(std::cout);
   }
 }
-*/
-
-/*
-uint16_t read16(std::size_t index) const {
-  assert(index + 1 < kSize);
-  std::array<Byte, 2> temp = {data_[index], data_[index + 1]};
-  return std::bit_cast<uint16_t>(temp);  // Little-endian assumed
-}
-
-// Write a 16-bit value across two adjacent 8-bit registers
-void write16(std::size_t index, uint16_t value) {
-  assert(index + 1 < kSize);
-  std::array<Byte, 2> temp = std::bit_cast<std::array<Byte, 2>>(value);
-  data_[index] = temp[0];
-  data_[index + 1] = temp[1];
-}
-*/
 
 int main() {
   tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
-  // RunGameBoy(cpu);
-  // cpu.PrettyDumpRegisters(std::cout);
-
-  tanukigb::RegisterSet rs{};
-
-  rs.A = 7;
-  rs.B = 8;
-  rs.C = 7;
-
-  bool i = rs.A == rs.B;
+  RunGameBoy(cpu);
+  cpu.PrettyPrintRegisters(std::cout);
 
   return 0;
 }

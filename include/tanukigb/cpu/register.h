@@ -47,11 +47,9 @@ class Register {
 
   T operator=(T value) noexcept { return fnoid_(value); }
 
-  // Marked explicit to control operators (can be controlled by client code by
-  // either defining non-member non-friend or explicitly converting. I prefer to
-  // use explicit conversion unless its a obvious (or occasionally a
-  // user-defined type)
-  explicit operator T() const noexcept { return fnoid_(); }
+  // Meh, probably should be explicit, and would remove the need for non assignment binary operators but ....
+  // Fine to leave as implicit, now the requirement is on me to ensure I've written all the operators. Can I test for this.
+  operator T() const noexcept { return fnoid_(); }
 
   // Almost all operators can be non friend :D
 
@@ -80,14 +78,14 @@ constexpr inline auto AsSigned(Register<T, F>& lhs) {
 template <std::integral T, RegisterFunctionoid<T> F>
 inline std::strong_ordering operator<=>(const Register<T, F>& lhs,
                                         const Register<T, F>& rhs) {
-  return (lhs.operator T()) <=> (rhs.operator T());
+  return (lhs.operator T() <=> rhs.operator T());
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
           RegisterFunctionoid<U> G>
 inline std::weak_ordering operator<=>(const Register<T, F>& lhs,
                                       const Register<U, G>& rhs) {
-  return (lhs.operator T()) <=> (rhs.operator U());
+  return (lhs.operator T() <=> rhs.operator U());
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
@@ -128,12 +126,12 @@ inline bool operator>=(const Register<T, F>& lhs, const Register<U, G>& rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator+(const Register<T, F>& lhs, U rhs) {
-  return (lhs.operator T() + rhs);
+  return ((lhs.operator T()) + rhs);
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator+=(Register<T, F>& lhs, U rhs) {
-  return (lhs = lhs.operator+(rhs));
+  return (lhs = operator+(lhs, rhs));
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
@@ -143,7 +141,7 @@ inline T operator-(const Register<T, F>& lhs, U rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator-=(Register<T, F>& lhs, U rhs) {
-  return (lhs = lhs.operator-(rhs));
+  return (lhs = operator-(lhs, rhs));
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
@@ -153,7 +151,7 @@ inline T operator*(const Register<T, F>& lhs, U rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator*=(Register<T, F>& lhs, U rhs) {
-  return (lhs = lhs.operator*(rhs));
+  return (lhs = operator*(lhs, rhs));
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
@@ -163,7 +161,7 @@ inline T operator/(const Register<T, F>& lhs, U rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator/=(Register<T, F>& lhs, U rhs) {
-  return (lhs = lhs.operator/(rhs));
+  return (lhs = operator/(lhs, rhs));
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
@@ -173,7 +171,7 @@ inline T operator%(const Register<T, F>& lhs, U rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator%=(Register<T, F>& lhs, U rhs) {
-  return (lhs = lhs.operator%(rhs));
+  return (lhs = operator%(lhs, rhs));
 }
 
 template <std::integral T, RegisterFunctionoid<T> F>
@@ -188,7 +186,7 @@ inline T operator&(const Register<T, F>& lhs, U rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator&=(Register<T, F>& lhs, U rhs) {
-  return (lhs = lhs.operator&(rhs));
+  return (lhs = operator&(lhs, rhs));
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
@@ -198,7 +196,7 @@ inline T operator|(const Register<T, F>& lhs, U rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator|=(Register<T, F>& lhs, U rhs) {
-  return (lhs = lhs.operator|(rhs));
+  return (lhs = operator|(lhs, rhs));
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
@@ -208,7 +206,7 @@ inline T operator^(const Register<T, F>& lhs, U rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator^=(Register<T, F>& lhs, U rhs) {
-  return (lhs = lhs.operator^(rhs));
+  return (lhs = operator^(lhs, rhs));
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
@@ -218,7 +216,7 @@ inline T operator<<(const Register<T, F>& lhs, U rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator<<=(Register<T, F>& lhs, U rhs) {
-  return (lhs = lhs.operator<<(rhs));
+  return (lhs = operator<<(lhs, rhs));
 }
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
@@ -228,7 +226,7 @@ inline T operator>>(const Register<T, F>& lhs, U rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
 inline T operator>>=(Register<T, F>& lhs, U rhs) {
-  return (lhs = lhs.operator>>(rhs));
+  return (lhs = operator>>(lhs, rhs));
 }
 
 // Although it makes sence and is possible to return Register& here, for
@@ -237,24 +235,24 @@ inline T operator>>=(Register<T, F>& lhs, U rhs) {
 
 template <std::integral T, RegisterFunctionoid<T> F>
 inline T operator++(Register<T, F>& reg) {
-  return reg.operator+=(1);
+  return operator+=(reg, 1);
 }
 
 template <std::integral T, RegisterFunctionoid<T> F>
 inline T operator++(Register<T, F>& reg, int) {
   T old = reg.operator T();
-  reg.operator++();
+  operator++(reg);
   return old;
 }
 template <std::integral T, RegisterFunctionoid<T> F>
 inline T operator--(Register<T, F>& reg) {
-  return reg.operator-=(1);
+  return operator-=(reg, 1);
 }
 
 template <std::integral T, RegisterFunctionoid<T> F>
 inline T operator--(Register<T, F>& reg, int) {
   T old = reg.operator T();
-  reg.operator--();
+  operator--(reg);
   return old;
 }
 
