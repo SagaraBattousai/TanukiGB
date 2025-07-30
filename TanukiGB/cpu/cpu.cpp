@@ -1,35 +1,20 @@
-#include <ostream>
-
 #include <tanukigb/cpu/cpu.h>
+#include <tanukigb/cpu/register_set.h>
 #include <tanukigb/memory/mmu.h>
 #include <tanukigb/types/types.h>
-#include <tanukigb/cpu/register_set.h>
+#include <tanukigb/utility/enum_utils.h>
+
+#include <ostream>
+#include <utility>
 
 namespace tanukigb {
 
-/////////////////////////////////////////////////////////
-
-/*
-enum class Flag : byte_t {
+enum class RegisterFlags : byte_t {
   Z = (1 << 7),
   N = (1 << 6),
   H = (1 << 5),
   C = (1 << 4)
 };
-
-
-
-  byte_t GetFlags() const noexcept { return F(); }
-  void SetFlags(Flag flags) noexcept { F() |= flags; }
-  void ClearFlags(Flag flags) noexcept { F() &= ~flags; }
-  // void ToggleFlags(Flag flags) noexcept { F() ^= flags; }
-
-  bool IsZFlagSet() const noexcept { return (F() & Flag::Z) != 0; }
-  bool IsNFlagSet() const noexcept { return (F() & Flag::N) != 0; }
-  bool IsHFlagSet() const noexcept { return (F() & Flag::H) != 0; }
-  bool IsCFlagSet() const noexcept { return (F() & Flag::C) != 0; }
-
- */
 
 class Cpu::CpuImpl {
  public:
@@ -37,26 +22,26 @@ class Cpu::CpuImpl {
 
   int Run();
 
- /*
-  byte_t GetFlags() const noexcept { return F(); }
-  void SetFlags(Flag flags) noexcept { F() |= flags; }
-  void ClearFlags(Flag flags) noexcept { F() &= ~flags; }
-  // void ToggleFlags(Flag flags) noexcept { F() ^= flags; }
-
-  bool IsZFlagSet() const noexcept { return (F() & Flag::Z) != 0; }
-  bool IsNFlagSet() const noexcept { return (F() & Flag::N) != 0; }
-  bool IsHFlagSet() const noexcept { return (F() & Flag::H) != 0; }
-  bool IsCFlagSet() const noexcept { return (F() & Flag::C) != 0; }
-
-  */
-
-  
   inline std::ostream& PrintRegisters(std::ostream& os) const {
     return (os << registers_ << std::endl);
   }
 
   inline std::ostream& PrettyPrintRegisters(std::ostream& os) const {
     return tanukigb::PrettyPrintRegisters(os, registers_);
+  }
+
+ private:  // Most functions can be private since this is a Pimpl's Impl
+  constexpr bool IsZFlagSet() const noexcept {
+    return IsFlagSet<RegisterFlags, RegisterFlags::Z>(registers_.F);
+  }
+  constexpr bool IsNFlagSet() const noexcept {
+    return IsFlagSet<RegisterFlags, RegisterFlags::N>(registers_.F);
+  }
+  constexpr bool IsHFlagSet() const noexcept {
+    return IsFlagSet<RegisterFlags, RegisterFlags::H>(registers_.F);
+  }
+  constexpr bool IsCFlagSet() const noexcept {
+    return IsFlagSet<RegisterFlags, RegisterFlags::C>(registers_.F);
   }
 
  private:
@@ -89,28 +74,27 @@ inline std::ostream& Cpu::PrettyPrintRegisters(std::ostream& os) const {
   return impl_->PrettyPrintRegisters(os);
 }
 
-
 int Cpu::CpuImpl::Run() {
   while (true) {
-    byte_t opcode = mmu_.Read(static_cast<word_t>(registers_.PC));
+    byte_t opcode = mmu_.Read(registers_.PC);
     registers_.PC++;
 
     switch (opcode) {
       case 0x31:
         // Todo: after MMU add helper as the postfix++ is mucky.
-        registers_.SP =
-            mmu_.Read(registers_.PC++) | mmu_.Read(registers_.PC++) << 8;
+        registers_.SP = mmu_.Read(registers_.PC++) | mmu_.Read(registers_.PC++)
+                                                         << 8;
         // registers_.PC() += 2;
         break;
 
       case 0xAF:
         // XOR's A with A (i.e. zeros it) we will cheat and just do that untill
         // we write the inner functions later
-        registers_.A = 0x00;
+        ClearRegister(registers_.A);
         registers_.F = 0b1000'0000;
-        //registers_.SetFlags(RegisterSet::Flag::Z);
-        //registers_.ClearFlags(RegisterSet::Flag::N | RegisterSet::Flag::H |
-        //                      RegisterSet::Flag::C);
+        // registers_.SetFlags(RegisterSet::Flag::Z);
+        // registers_.ClearFlags(RegisterSet::Flag::N | RegisterSet::Flag::H |
+        //                       RegisterSet::Flag::C);
         break;
       default:
         return opcode;

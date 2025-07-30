@@ -5,7 +5,7 @@
 
 #include <array>
 #include <bit>
-#include <chrono>
+#include <format>
 #include <cstring>
 #include <iostream>
 #include <limits>
@@ -31,7 +31,7 @@ std::ostream& operator<<(std::ostream& os, const std::array<T, Count>& arr) {
   return os;
 }
 
-void RunGameBoy(tanukigb::Cpu& cpu) {
+static void RunGameBoy(tanukigb::Cpu& cpu) {
   int ret = cpu.Run();
 
   if (ret != 0) {
@@ -40,10 +40,18 @@ void RunGameBoy(tanukigb::Cpu& cpu) {
   }
 }
 
+template<typename T, T v, typename U>
+T f(U u) {
+  return v + u;
+}
+
+
 int main() {
   tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
   RunGameBoy(cpu);
   cpu.PrettyPrintRegisters(std::cout);
+
+  std::cout << f<int, 4>(1.f);
 
   return 0;
 }

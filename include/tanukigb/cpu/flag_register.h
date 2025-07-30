@@ -9,33 +9,29 @@ template <typename FlagFnoid, typename Integral>
 concept FlagRegisterFunctionoid =
     std::is_integral_v<Integral> && RegisterFunctionoid<FlagFnoid, Integral> &&
     requires(FlagFnoid fnoid, Integral value) {
-  // We'll make it a nttp as required flag should be known at compile time!
-      { fnoid.template GetFlag<7>() } -> std::same_as<Integral>;
+      // We'll make it a nttp as required flag should be known at compile time!
+      // 0 is just a placeholder. Can we force it to be an integral of a
+      // specific type?
+      { fnoid.template GetFlag<0>() } -> std::same_as<Integral>;
+      { fnoid.template SetFlag<0>() } -> std::same_as<Integral>;
     };
 
 template <std::integral T, FlagRegisterFunctionoid<T> Functionoid>
-class FlagRegister {
+class FlagRegister : Register<T, Functionoid> {
  public:
-  explicit FlagRegister(Functionoid fnoid) : fnoid_{fnoid} {}
+  FlagRegister(Functionoid fnoid) : Register(fnoid) {}
   ~FlagRegister() = default;
 
   FlagRegister(const FlagRegister&) = delete;
   FlagRegister(FlagRegister&&) = delete;
 
-  T operator=(T value) { return fnoid_(value); }
-
-  operator T() const { return fnoid_(); }
-
- private:
-  Functionoid fnoid_;
+  // I think its fine just to use the same T ->template<std::integral U, U flag>
+  template <T flag>
+  constexpr T GetFlag() const {
+    fnoid_.get<
+  
+  }
 };
 
-template <std::integral T, FlagRegisterFunctionoid<T> Functionoid>
-std::ostream& operator<<(std::ostream& os,
-                         const FlagRegister<T, Functionoid>& obj) {
-  os << std::format("{:#0{}x}", obj.operator T(),
-                    (1 + sizeof(T)) * internal::kHexCharsPerByte);
-  return os;
-}
 }  // namespace tanukigb
 #endif

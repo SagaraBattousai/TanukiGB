@@ -9,7 +9,9 @@ target_sources(utility PUBLIC
   TYPE HEADERS
   BASE_DIRS ${MODULE_ROOT}
   FILES
+    "${utility_MODULE_ROOT}/concepts.h"
     "${utility_MODULE_ROOT}/enum_utils.h"
+    "${utility_MODULE_ROOT}/enum_flag_utils.h"
     "${utility_MODULE_ROOT}/integral.h"
     "${utility_MODULE_ROOT}/pimpl.h"
     # "${utility_MODULE_ROOT}/property.h"
