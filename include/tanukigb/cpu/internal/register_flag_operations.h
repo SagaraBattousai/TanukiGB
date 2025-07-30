@@ -40,17 +40,17 @@ constexpr inline bool IsFlagClear(const Register<T, F>& reg) noexcept {
 
 template <unsigned int... flags, std::integral T, RegisterFunctionoid<T> F>
 constexpr inline T SetFlags(Register<T, F>& reg) noexcept {
-  reg |= (flags | ...);
+  return reg |= (flags | ...);
 }
 
 template <unsigned int... flags, std::integral T, RegisterFunctionoid<T> F>
 constexpr inline T ClearFlags(Register<T, F>& reg) noexcept {
-  reg &= ~(flags | ...);
+  return reg &= ~(flags | ...);
 }
 
 template <unsigned int... flags, std::integral T, RegisterFunctionoid<T> F>
 constexpr inline T ToggleFlags(Register<T, F>& reg) noexcept {
-  reg ^= (flags | ...);
+  return reg ^= (flags | ...);
 }
 
 // Since its common to use enums for flags the following are helpers when using a scoped enum's for flags

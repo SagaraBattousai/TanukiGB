@@ -18,7 +18,7 @@ enum class RegisterFlags : byte_t {
 
 class Cpu::CpuImpl {
  public:
-  CpuImpl(MMU&& mmu) : mmu_(std::move(mmu)) {};  //, registers_(){};
+  CpuImpl(MMU&& mmu) : mmu_{std::move(mmu)}, registers_{} {};
 
   int Run();
 
@@ -62,7 +62,9 @@ Cpu::Cpu(Cpu&&) = default;
 Cpu& Cpu::operator=(Cpu&&) = default;
 
 Cpu Cpu::GameboyCpu() { return Cpu(Pimpl<CpuImpl>(MMU::GameboyMMU())); }
-Cpu Cpu::ColourGameboyCpu() { return Cpu(MMU::ColourGameboyMMU()); }
+Cpu Cpu::ColourGameboyCpu() {
+  return Cpu(Pimpl<CpuImpl>(MMU::ColourGameboyMMU()));
+}
 
 int Cpu::Run() { return impl_->Run(); }
 
@@ -88,9 +90,10 @@ int Cpu::CpuImpl::Run() {
         break;
 
       case 0xAF:
-        // Same as ClearRegister(registers_.A) but VV is technically what the Opcode calls for:
+        // Same as ClearRegister(registers_.A) but VV is technically what the
+        // Opcode calls for:
         // TODO: make nicer
-        registers_.A ^= static_cast<decltype(registers_.A)::value_type>(registers_.A);
+        registers_.A ^= registers_.A;
 
         SetFlags<RegisterFlags, RegisterFlags::Z>(registers_.F);
 

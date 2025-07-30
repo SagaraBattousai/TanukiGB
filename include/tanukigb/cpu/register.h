@@ -2,6 +2,7 @@
 #define __TANUKIGB_CPU_REGISTER_H__
 
 #include <tanukigb/cpu/internal/register_arithmetic_operators.h>
+#include <tanukigb/cpu/internal/register_bitwise_operators.h>
 #include <tanukigb/cpu/internal/register_comparison_operators.h>
 #include <tanukigb/cpu/internal/register_flag_operations.h>
 #include <tanukigb/cpu/register_functionoid.h>
@@ -49,7 +50,16 @@ class Register {
   // assignment binary operators but .... Fine to leave as implicit, now the
   // requirement is on me to ensure I've written all the operators. Can I test
   // for this.
+  //
+  // Now we have .Value lets try explicit again
+  //
+  // I still prefer implicit even though it only saves writing .Value() in a relativly specific case (reading from an array). Would be interesting if we could use explicit (...) to work around this.
+  //
   operator T() const noexcept { return fnoid_(); }
+
+  // Does not need to be a member but just a nice way to convert without calling .operatorT() in external code and
+  // potentially allows for making operator T() explicit and then clients can use Register.Value() as a nice replacement
+  T Value() const noexcept { return this->operator T(); }
 
  private:
   Functionoid fnoid_;
