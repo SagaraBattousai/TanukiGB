@@ -22,25 +22,25 @@ class Cpu::CpuImpl {
 
   int Run();
 
-  inline std::ostream& PrintRegisters(std::ostream& os) const {
+  std::ostream& PrintRegisters(std::ostream& os) const {
     return (os << registers_ << std::endl);
   }
 
-  inline std::ostream& PrettyPrintRegisters(std::ostream& os) const {
+  std::ostream& PrettyPrintRegisters(std::ostream& os) const {
     return tanukigb::PrettyPrintRegisters(os, registers_);
   }
 
  private:  // Most functions can be private since this is a Pimpl's Impl
-  constexpr bool IsZFlagSet() const noexcept {
+  bool IsZFlagSet() const noexcept {
     return IsFlagSet<RegisterFlags, RegisterFlags::Z>(registers_.F);
   }
-  constexpr bool IsNFlagSet() const noexcept {
+  bool IsNFlagSet() const noexcept {
     return IsFlagSet<RegisterFlags, RegisterFlags::N>(registers_.F);
   }
-  constexpr bool IsHFlagSet() const noexcept {
+  bool IsHFlagSet() const noexcept {
     return IsFlagSet<RegisterFlags, RegisterFlags::H>(registers_.F);
   }
-  constexpr bool IsCFlagSet() const noexcept {
+  bool IsCFlagSet() const noexcept {
     return IsFlagSet<RegisterFlags, RegisterFlags::C>(registers_.F);
   }
 

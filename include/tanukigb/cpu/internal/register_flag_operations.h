@@ -84,6 +84,7 @@ template <enum_type enum_flag_t, enum_flag_t enum_flags, std::integral T,
           RegisterFunctionoid<T> F>
 constexpr inline T ToggleFlags(Register<T, F>& reg) noexcept {
   reg ^= ((to_unsigned_underlying(enum_flags)) | ...);
+}
 
 }  // namespace tanukigb
 

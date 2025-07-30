@@ -16,7 +16,8 @@ using tanukigb::byte_t;
 using tanukigb::word_t;
 
 // Could make utility function taking Container that can report size but meh...
-// Maybe just for array since chunking (or peaking I cant remember what it was
+// Maybe just for array
+// since chunking (or peaking I cant remember what it was
 // called) is one of the "acceptable" uses of reinterpret cast and other types
 // may use packing I guess? I need to find a hardcore C++ developer to learn
 // about why reinterpret_cast is considered evil
