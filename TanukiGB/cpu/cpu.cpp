@@ -88,13 +88,17 @@ int Cpu::CpuImpl::Run() {
         break;
 
       case 0xAF:
-        // XOR's A with A (i.e. zeros it) we will cheat and just do that untill
-        // we write the inner functions later
-        ClearRegister(registers_.A);
-        registers_.F = 0b1000'0000;
-        // registers_.SetFlags(RegisterSet::Flag::Z);
-        // registers_.ClearFlags(RegisterSet::Flag::N | RegisterSet::Flag::H |
-        //                       RegisterSet::Flag::C);
+        // Same as ClearRegister(registers_.A) but VV is technically what the Opcode calls for:
+        // TODO: make nicer
+        registers_.A ^= static_cast<decltype(registers_.A)::value_type>(registers_.A);
+
+        SetFlags<RegisterFlags, RegisterFlags::Z>(registers_.F);
+
+        // While clearing all flags before setting the one above achieves a
+        // similar result, it is technically wrong as it would destroy the lower
+        // (unused) bits.
+        ClearFlags<RegisterFlags, RegisterFlags::N, RegisterFlags::H,
+                   RegisterFlags::C>(registers_.F);
         break;
       default:
         return opcode;

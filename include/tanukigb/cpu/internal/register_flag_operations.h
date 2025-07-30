@@ -67,23 +67,22 @@ constexpr inline bool IsFlagClear(const Register<T, F>& reg) noexcept {
   return IsFlagClear<to_unsigned_underlying(enum_flag)>(reg);
 }
 
-//////////
-template <enum_type enum_flag_t, enum_flag_t enum_flags, std::integral T,
+template <enum_type enum_flag_t, enum_flag_t ...enum_flags, std::integral T,
           RegisterFunctionoid<T> F>
 constexpr inline T SetFlags(Register<T, F>& reg) noexcept {
-  reg |= ((to_unsigned_underlying(enum_flags)) | ...);
+  return reg |= (to_unsigned_underlying(enum_flags) | ...);
 }
-//////////
-template <enum_type enum_flag_t, enum_flag_t enum_flags, std::integral T,
+
+template <enum_type enum_flag_t, enum_flag_t ...enum_flags, std::integral T,
           RegisterFunctionoid<T> F>
 constexpr inline T ClearFlags(Register<T, F>& reg) noexcept {
-  reg &= ~((to_unsigned_underlying(enum_flags)) | ...);
+  return reg &= ~(to_unsigned_underlying(enum_flags) | ...);
 }
-/////////////
-template <enum_type enum_flag_t, enum_flag_t enum_flags, std::integral T,
+
+template <enum_type enum_flag_t, enum_flag_t ...enum_flags, std::integral T,
           RegisterFunctionoid<T> F>
 constexpr inline T ToggleFlags(Register<T, F>& reg) noexcept {
-  reg ^= ((to_unsigned_underlying(enum_flags)) | ...);
+  return reg ^= (to_unsigned_underlying(enum_flags) | ...);
 }
 
 }  // namespace tanukigb
