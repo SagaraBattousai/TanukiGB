@@ -1,37 +1,86 @@
 #ifndef __TANUKIGB_CPU_OPCODE_HANDLER_H__
 #define __TANUKIGB_CPU_OPCODE_HANDLER_H__
 
+// As This is an application and not a library I must remember that I can be
+// bespoky (I love this pattern but I dont have time to waste trying to do so,
+// its so awesome though).
+
+#include <tanukigb/cpu/executor.h>
+#include <tanukigb/cpu/opcode_tags.h>
+#include <tanukigb/types/types.h>
+
 #include <array>
-#include <concepts>
-#include <utility>
+
+// TODO: Remove iostream
+#include <iostream>
 
 namespace tanukigb {
 
-template <std::integral T = int, T Opcode>
-struct OpcodeHandler {
-  template <typename R, typename Executor>
-  static inline R execute(Executor& t) {
-    return Opcode;
+using opcode_return_type = int;
+
+template <Executor E>
+using OpcodeExecutionFunctionPtr = opcode_return_type (*)(E&);
+
+// Forward Declare CRTP (Not called base since we're using public inheritance)
+template <typename Underlying, OpcodeTag Tag>
+struct OpcodeHandlerCRTP;
+
+// Forward Declare actual Handler
+template <byte_t Opcode>
+struct OpcodeHandler;
+
+namespace opcode_details {
+// template<typename
+// constexpr auto GenerateJumpTable
+}
+
+template <typename Underlying>
+struct OpcodeHandlerCRTP<Underlying, opcode_tags::Load8Bit> {
+  template <Executor E>
+  static inline opcode_return_type execute(E& executor) {
+    // TODO: Do stuff
+    // TODO: set up what 8bit loads should return
+    Underlying::do_8bit_load(executor);
+    // TODO: Other stuff
   }
 };
 
-template <typename R, typename Executor>
-using OpcodeHandlerFunctionPtr = static inline R (*)(Executor&);
+template <typename Underlying>
+struct OpcodeHandlerCRTP<Underlying, opcode_tags::Load16Bit> {
+  template <Executor E>
+  static inline opcode_return_type execute(E& executor) {
+    // TODO: Do stuff
+    // TODO: set up what 16bit loads should return
+    std::cout << "CRTP\n";
+    Underlying::do_16bit_load(executor);
+    // TODO: Other stuff
+    return 0;
+  }
+};
 
-namespace opcode_handler_detail {
+template <byte_t Opcode>
+struct OpcodeHandler
+    : OpcodeHandlerCRTP<OpcodeHandler<Opcode>, opcode_tags::Other> {
+  template <Executor E>
+  static inline opcode_return_type execute(E& executor) {
+    // TODO
+    return opcode_return_type{};
+  }
+};
 
-template <typename R, typename Executor, std::integral T = int, T... opcodes>
-constexpr auto GenJumpTable(std::integer_sequence<T, opcodes...>) {
-  return std::array<OpcodeHandlerFuncPtr<R, Executor>, sizeof...(opcodes)>{
-      (OpcodeHandler<T, opcodes>::template execute<R, Executor>)...};
-}
-
-}  // namespace opcode_handler_detail
-
-template <typename R, typename Executor, std::integral T, T opcode_count>
-constexpr auto GenJumpTable() {
-  return GenJumpTable<R, Executor, T>(std::make_integer_sequence<T, opcode_count>{});
-}
+template <>
+struct OpcodeHandler<0x31>
+    : OpcodeHandlerCRTP<OpcodeHandler<0x31>, opcode_tags::Load16Bit> {
+  template <typename Executor>
+  static inline opcode_return_type do_16bit_load(Executor& t) {
+    std::cout << "This Works: " << t << std::endl;
+    // Todo: after MMU add helper as the postfix++ is mucky.
+    // registers_.SP = mmu_.Read(registers_.PC++) | mmu_.Read(registers_.PC++)
+    //                                                 << 8;
+    // registers_.PC() += 2;
+    return 0;
+  }
+};
 
 // template <typename T, byte_t... IS>
 // constexpr std::array<OpcodeHandlerFuncPtr<T>, sizeof...(IS)> GenJumpTable() {

@@ -9,6 +9,9 @@ namespace tanukigb {
 // put more bespoke concepts in internal namespaces in the header (or annonomous
 // namespaces in cpp file).
 
+template<typename T, typename... U>
+concept one_of = (std::same_as<T, U> || ...);
+
 template <typename T, typename... U>
 concept none_of = (!std::same_as<T, U> && ...);
 

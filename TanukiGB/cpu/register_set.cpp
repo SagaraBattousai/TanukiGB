@@ -36,6 +36,7 @@ enum RegisterOffset : std::size_t {
   SP = 8,
   PC = 10,
 
+  AF = min(A, F),
   BC = min(B, C),
   DE = min(D, E),
   HL = min(H, L)
@@ -60,6 +61,7 @@ RegisterSet::RegisterSet()
       SP{WordRegisterFnoid{register_buffer_.data() + RegisterOffset::SP}},
       PC{WordRegisterFnoid{register_buffer_.data() + RegisterOffset::PC}},
 
+      AF{WordRegisterFnoid{register_buffer_.data() + RegisterOffset::AF}},
       BC{WordRegisterFnoid{register_buffer_.data() + RegisterOffset::BC}},
       DE{WordRegisterFnoid{register_buffer_.data() + RegisterOffset::DE}},
       HL{WordRegisterFnoid{register_buffer_.data() + RegisterOffset::HL}} {}

@@ -64,7 +64,7 @@ class RegisterSet {
   WordRegister SP;
   WordRegister PC;
 
-  // 16 Bit Composite Registers (AF isn't one apparently)
+  WordRegister AF;
   WordRegister BC;
   WordRegister DE;
   WordRegister HL;

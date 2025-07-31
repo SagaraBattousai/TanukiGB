@@ -2,6 +2,7 @@
 #include <tanukigb/cpu/cpu.h>
 #include <tanukigb/cpu/register_set.h>
 #include <tanukigb/types/types.h>
+#include <tanukigb/cpu/opcode_handler.h>
 
 #include <array>
 #include <bit>
@@ -41,47 +42,17 @@ static void RunGameBoy(tanukigb::Cpu& cpu) {
   }
 }
 
-template <int Opcode>
-struct OpcodeHandler {
-  template <typename T>
-  static int execute(T& t) {
-    std::cout << "Unknown:" << std::endl;
-    return Opcode;
-  }
-};
-
-template <>
-struct OpcodeHandler<0x00> {
-  template <typename T>
-  static int execute(T& t) {
-    std::cout << "0x00 = " << t << std::endl;
-    return 0;
-  }
-};
-
-template <>
-struct OpcodeHandler<0x01> {
-  template <typename T>
-  static int execute(T& t) {
-    std::cout << "0x01 = " << t << std::endl;
-    return 1;
-  }
-};
-
-
-
 int main() {
   tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
   RunGameBoy(cpu);
   cpu.PrettyPrintRegisters(std::cout);
 
-  auto arr = GenJumpTable<int, 3>();
+  std::array<tanukigb::OpcodeExecutionFunctionPtr<int>, 1> arr = {
+    &tanukigb::OpcodeHandler<0x31>::template execute<int>
+  };
 
-  int i = 7;
-
-  arr[0](i);
-  arr[1](i);
-  arr[2](i);
+  int x = 7;
+  arr[0](x);
 
   return 0;
 }
