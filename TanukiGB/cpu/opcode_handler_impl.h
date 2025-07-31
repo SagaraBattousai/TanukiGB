@@ -1,63 +1,36 @@
-#ifndef __TANUKIGB_INTERNAL_CPU_OPCODE_HANDLER_H__
-#define __TANUKIGB_INTERNAL_CPU_OPCODE_HANDLER_H__
+#ifndef __TANUKIGB_INTERNAL_CPU_OPCODE_HANDLER_IMPL_H__
+#define __TANUKIGB_INTERNAL_CPU_OPCODE_HANDLER_IMPL_H__
+
+// We could split cpu_impl into a private header (so we can force T to be
+// cpu_impl and get IDE support) but thats a lot just for IDE help.
 
 #include <tanukigb/types/types.h>
+#include <tanukigb/cpu/opcode_handler.h>
 
 namespace tanukigb {
 
-// Cannot work out how to have just the execute() be templated by T and allow
-// JumpTable to be generic too! Alternatives allow for forcing execute() to
-// take a reference to an interface or (as in this case) requiring the JumpTable
-// to specify Type T (which is what we will do (for now)). I don't even know
-// if it is better to make the struct parameter take type T rather than the
-// function; however, as it stands it doesn't really matter.
+// Bit too complex due to need of either a unified interface or makeing everythink public.
 
-// No longer need Template Parameter Pack as each opcode know which extra parts
-// it needs.
-
-template <byte_t Opcode>
-struct OpcodeHandler {
-  template<typename T>
-  static byte_t execute(T& t) {
-    //Unknown Opcode
-    return Opcode;
-  }
-};
 
 template <>
-struct OpcodeHandler<0x00> {
-  template <typename T>
-  static byte_t execute(T& t) {
-    //HALT
-    ;
+struct OpcodeHandler<byte_t, 0x31> {
+  template <typename R, typename Executor>
+  static R execute(Executor& t) {
+    // Todo: after MMU add helper as the postfix++ is mucky.
+    registers_.SP = mmu_.Read(registers_.PC++) | mmu_.Read(registers_.PC++)
+                                                     << 8;
+    // registers_.PC() += 2;
+    return 0;
   }
 };
 
-//template <>
-//struct OpcodeHandler<T, 0x02, Args...> {
-//  }
-//};
 
+  
 
-
-////template<typename T, std::size_t... IS>
-// template<typename T, byte_t... IS>
-// constexpr std::array<OpcodeHandlerFuncPtr<T>, sizeof...(IS)> GenJumpTable(){
-//   std::array<OpcodeHandlerFuncPtr<T>, sizeof...(IS)>arr
-//   {(OpcodeHandler<IS>::execute<T>)...}; return arr;
-// }
-
-//template <typename T, byte_t... IS>
-//constexpr std::array<OpcodeHandlerFuncPtr<T>, sizeof...(IS)> GenJumpTable() {
-//  std::array<OpcodeHandlerFuncPtr<T>, sizeof...(IS)> arr{
-//      (OpcodeHandler<T, IS>::execute)...};
-//  return arr;
-//}
-
-
-
-
-
+// template <>
+// struct OpcodeHandler<T, 0x02, Args...> {
+//   }
+// };
 
 /*
 // GMB 8bit-Loadcommands
@@ -183,8 +156,6 @@ GMB Jumpcommands
  *
  *
  */
-}
-
-
+}  // namespace tanukigb
 
 #endif

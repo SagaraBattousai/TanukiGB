@@ -9,15 +9,15 @@
 
 namespace tanukigb {
 
-enum class RegisterFlags : byte_t {
-  Z = (1 << 7),
-  N = (1 << 6),
-  H = (1 << 5),
-  C = (1 << 4)
-};
-
 class Cpu::CpuImpl {
  public:
+  enum class RegisterFlags : byte_t {
+    Z = (1 << 7),
+    N = (1 << 6),
+    H = (1 << 5),
+    C = (1 << 4)
+  };
+
   CpuImpl(MMU&& mmu) : mmu_{std::move(mmu)}, registers_{} {};
 
   int Run();

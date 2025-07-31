@@ -42,8 +42,8 @@ include(DocsUtils)
 
 if(MSVC)
   # Wall removed as msvc has some errors that trigger this
-  # Shouldnt need /Zc:nrvo as we have /permissive-. However, Debug still wont allow it in msvc.
-  add_compile_options(/permissive- /W4 /Zc:nrvo) # /WX) # Wall)
+  # Dont need /Zc:nrvo as we have /permissive-. However, Debug still wont allow it in msvc (even with Zc:nrvo).
+  add_compile_options(/permissive- /W4) # /WX) # Wall)
   # set(VS_STARTUP_PROJECT "")
 else()
   add_compile_options(-Wall -Wextra -pedantic -Werror)

@@ -7,29 +7,10 @@
 #include <tanukigb/types/types.h>
 
 #include <array>
-#include <bit>
 #include <format>
 #include <ostream>
 
 namespace tanukigb {
-
-using rset_offset_type = std::array<int, 0>::size_type;
-
-template <rset_offset_type BigEndianOffset, rset_offset_type LittleEndianOffset>
-consteval rset_offset_type EndianOffset() {
-  if constexpr (std::endian::native == std::endian::big) {
-    return BigEndianOffset;
-  } else if constexpr (std::endian::native == std::endian::little) {
-    return LittleEndianOffset;
-  } else {
-    static_assert(
-        false,
-        "Mixed endian is (potentially currently) not supported. A per type "
-        "endianness check may soon be implemented if some types have different "
-        "endianness but niche byte layouts (e.g. using words instead of bytes "
-        "or odd ordering) is unlikely to be supported).");
-  }
-}
 
 // Using explicit template initilisation declaration (and definition in the
 // .cpp) reduces code bloat and removes msvc's warning about dll-interface
@@ -69,9 +50,8 @@ class RegisterSet {
     return RegisterSet(init);
   }
 
-  // 8 Bit Registers!
+  // 8 Bit Registers
   ByteRegister A;
-  // TODO Make Flag Register
   ByteRegister F;
   ByteRegister B;
   ByteRegister C;

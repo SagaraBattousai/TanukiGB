@@ -37,14 +37,37 @@ static void RunGameBoy(tanukigb::Cpu& cpu) {
 
   if (ret != 0) {
     std::cout << std::format("Unknown Opcode: {:#02x}\n", ret);
-    cpu.PrintRegisters(std::cout);
+    cpu.PrintRegisters(std::cout) << std::endl;
   }
 }
 
-template<typename T, T v, typename U>
-T f(U u) {
-  return v + u;
-}
+template <int Opcode>
+struct OpcodeHandler {
+  template <typename T>
+  static int execute(T& t) {
+    std::cout << "Unknown:" << std::endl;
+    return Opcode;
+  }
+};
+
+template <>
+struct OpcodeHandler<0x00> {
+  template <typename T>
+  static int execute(T& t) {
+    std::cout << "0x00 = " << t << std::endl;
+    return 0;
+  }
+};
+
+template <>
+struct OpcodeHandler<0x01> {
+  template <typename T>
+  static int execute(T& t) {
+    std::cout << "0x01 = " << t << std::endl;
+    return 1;
+  }
+};
+
 
 
 int main() {
@@ -52,7 +75,13 @@ int main() {
   RunGameBoy(cpu);
   cpu.PrettyPrintRegisters(std::cout);
 
-  std::cout << f<int, 4>(1.f);
+  auto arr = GenJumpTable<int, 3>();
+
+  int i = 7;
+
+  arr[0](i);
+  arr[1](i);
+  arr[2](i);
 
   return 0;
 }

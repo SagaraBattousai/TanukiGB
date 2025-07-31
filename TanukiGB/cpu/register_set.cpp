@@ -67,15 +67,19 @@ RegisterSet::RegisterSet()
 // Could do one where we also print the composite registers (although they're
 // "fake")
 std::ostream& PrettyPrintRegisters(std::ostream& os, const RegisterSet& rs) {
-  os << std::format("  \t   {:s}\n", "Z: N: H: C:| Unused") 
+  os << "|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|\n"
+     << "| Flags: Z: N: H: C: - Unused |\n"
+     << std::format(
+            "|        {:d}  {:d}  {:d}  {:d}  - {:04b}   "
+            "|\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|\n",
+            IsFlagSet<128>(rs.F), IsFlagSet<64>(rs.F), IsFlagSet<32>(rs.F),
+            IsFlagSet<16>(rs.F), (rs.F & 0b0000'1111))
 
-     << "A: " << rs.A << "\tF: "
-     << std::format("{:d}  {:d}  {:d}  {:d} | {:04b} = ",
-                    IsFlagSet<128>(rs.F), IsFlagSet<64>(rs.F), IsFlagSet<32>(rs.F),
-                    IsFlagSet<16>(rs.F), (rs.F & 0b0000'1111)) <<  rs.F
-     << "\nB: " << rs.B << "\tC: " << rs.C << "\nD: " << rs.D << "\tE: " << rs.E
-     << "\nH: " << rs.H << "\tL: " << rs.L << "\nSP: " << rs.SP
-     << "\nPC: " << rs.PC << std::endl;
+     << "| A: " << rs.A << "\tF: " << rs.F << "       |\n| B: " << rs.B
+     << "\tC: " << rs.C << "       |\n| D: " << rs.D << "\tE: " << rs.E
+     << "       |\n| H: " << rs.H << "\tL: " << rs.L
+     << "       |\n| SP: " << rs.SP << "                  |\n| PC: " << rs.PC
+     << "                  |\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|" << std::endl;
   return os;
 }
 

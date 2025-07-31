@@ -11,12 +11,12 @@ set(cpu_module
   "${cpu_MODULE_ROOT}/internal/register_arithmetic_operators.h"
   "${cpu_MODULE_ROOT}/internal/register_bitwise_operators.h"
   "${cpu_MODULE_ROOT}/internal/register_comparison_operators.h"
-  # "${cpu_MODULE_ROOT}/flag_register.h"
+  "${cpu_MODULE_ROOT}/opcode_handler.h"
   "${cpu_MODULE_ROOT}/register_set.h"
   "${cpu_MODULE_ROOT}/register_set_functionoid.h"
   )
 
-set(cpu_private_module "opcode_handler.h")
+set(cpu_private_module "opcode_handler_impl.h")
 
 add_library(cpu SHARED ${cpp_sources} ${c_sources})
 

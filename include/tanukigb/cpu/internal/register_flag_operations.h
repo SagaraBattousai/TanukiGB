@@ -32,10 +32,7 @@ constexpr inline bool IsFlagSet(const Register<T, F>& reg) noexcept {
 
 template <unsigned int flag, std::integral T, RegisterFunctionoid<T> F>
 constexpr inline bool IsFlagClear(const Register<T, F>& reg) noexcept {
-  static_assert(std::has_single_bit(flag),
-                "A Flag is a single bit in the register and therefore must be "
-                "a power of 2");
-  return (reg & flag) == rfo_internal::ClearBit;
+  return !IsFlagSet<flag>(reg);
 }
 
 template <unsigned int... flags, std::integral T, RegisterFunctionoid<T> F>
