@@ -6,58 +6,32 @@
 // its so awesome though).
 
 #include <tanukigb/cpu/executor.h>
+#include <tanukigb/cpu/internal/opcode/opcode_handler_fwd_decls.h>
 #include <tanukigb/cpu/opcode_tags.h>
 #include <tanukigb/types/types.h>
 
 #include <array>
+#include <utility>
 
 // TODO: Remove iostream
 #include <iostream>
 
 namespace tanukigb {
 
-using opcode_return_type = int;
-
-template <Executor E>
-using OpcodeExecutionFunctionPtr = opcode_return_type (*)(E&);
-
-// Forward Declare CRTP (Not called base since we're using public inheritance)
-template <typename Underlying, OpcodeTag Tag>
-struct OpcodeHandlerCRTP;
-
-// Forward Declare actual Handler
-template <byte_t Opcode>
-struct OpcodeHandler;
-
 namespace opcode_details {
-// template<typename
-// constexpr auto GenerateJumpTable
+template <Executor E, opcode_type... Ops>
+constexpr auto GenerateJumpTable(std::integer_sequence<opcode_type, Ops...>) {
+  return std::array<OpcodeExecutionFunctionPtr<E>, sizeof...(Ops)> = {
+             (&OpcodeHandler<Ops>::template execute<E>)...};
 }
 
-template <typename Underlying>
-struct OpcodeHandlerCRTP<Underlying, opcode_tags::Load8Bit> {
-  template <Executor E>
-  static inline opcode_return_type execute(E& executor) {
-    // TODO: Do stuff
-    // TODO: set up what 8bit loads should return
-    Underlying::do_8bit_load(executor);
-    // TODO: Other stuff
-  }
-};
+}  // namespace opcode_details
 
-template <typename Underlying>
-struct OpcodeHandlerCRTP<Underlying, opcode_tags::Load16Bit> {
-  template <Executor E>
-  static inline opcode_return_type execute(E& executor) {
-    // TODO: Do stuff
-    // TODO: set up what 16bit loads should return
-    std::cout << "CRTP\n";
-    Underlying::do_16bit_load(executor);
-    // TODO: Other stuff
-    return 0;
-  }
-};
-
+template <Executor E, opcode_type Num_Ops>
+constexpr auto GenerateJumpTable() {
+  return opcode_details::GenerateJumpTable(
+      std::make_integer_sequence<opcode_type, Num_Ops>{});
+}
 template <byte_t Opcode>
 struct OpcodeHandler
     : OpcodeHandlerCRTP<OpcodeHandler<Opcode>, opcode_tags::Other> {
@@ -68,22 +42,17 @@ struct OpcodeHandler
   }
 };
 
-template <>
-struct OpcodeHandler<0x31>
-    : OpcodeHandlerCRTP<OpcodeHandler<0x31>, opcode_tags::Load16Bit> {
-  template <typename Executor>
-  static inline opcode_return_type do_16bit_load(Executor& t) {
-    std::cout << "This Works: " << t << std::endl;
-    // Todo: after MMU add helper as the postfix++ is mucky.
-    // registers_.SP = mmu_.Read(registers_.PC++) | mmu_.Read(registers_.PC++)
-    //                                                 << 8;
-    // registers_.PC() += 2;
-    return 0;
-  }
-};
+#include <tanukigb/cpu/internal/opcode/16bit_arithmetic.h>
+#include <tanukigb/cpu/internal/opcode/16bit_load.h>
+#include <tanukigb/cpu/internal/opcode/8bit_arithmetic.h>
+#include <tanukigb/cpu/internal/opcode/8bit_load.h>
+#include <tanukigb/cpu/internal/opcode/jump.h>
+#include <tanukigb/cpu/internal/opcode/rotate_and_shift.h>
+#include <tanukigb/cpu/internal/opcode/single_bit.h>
 
 // template <typename T, byte_t... IS>
-// constexpr std::array<OpcodeHandlerFuncPtr<T>, sizeof...(IS)> GenJumpTable() {
+// constexpr std::array<OpcodeHandlerFuncPtr<T>, sizeof...(IS)> GenJumpTable()
+// {
 //   std::array<OpcodeHandlerFuncPtr<T>, sizeof...(IS)> arr{
 //       (OpcodeHandler<T, IS>::execute)...};
 //   return arr;
@@ -116,8 +85,9 @@ inline void load(byte_t& to, byte_t from) { to = from; }
 GMB 16bit-Loadcommands
   ld   rr,nn       x1 nn nn  12 ---- rr=nn (rr may be BC,DE,HL or SP)
   ld   SP,HL       F9         8 ---- SP=HL
-  push rr          x5        16 ---- SP=SP-2  (SP)=rr   (rr may be BC,DE,HL,AF)
-  pop  rr          x1        12 (AF) rr=(SP)  SP=SP+2   (rr may be BC,DE,HL,AF)
+  push rr          x5        16 ---- SP=SP-2  (SP)=rr   (rr may be
+BC,DE,HL,AF) pop  rr          x1        12 (AF) rr=(SP)  SP=SP+2   (rr may be
+BC,DE,HL,AF)
 
 GMB 8bit-Arithmetic/logical Commands
   add  A,r         8x         4 z0hc A=A+r

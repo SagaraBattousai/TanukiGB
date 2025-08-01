@@ -1,10 +1,10 @@
 #ifndef __TANUKIGB_CPU_REGISTER_H__
 #define __TANUKIGB_CPU_REGISTER_H__
 
-#include <tanukigb/cpu/internal/register_arithmetic_operators.h>
-#include <tanukigb/cpu/internal/register_bitwise_operators.h>
-#include <tanukigb/cpu/internal/register_comparison_operators.h>
-#include <tanukigb/cpu/internal/register_flag_operations.h>
+#include <tanukigb/cpu/internal/register/register_arithmetic_operators.h>
+#include <tanukigb/cpu/internal/register/register_bitwise_operators.h>
+#include <tanukigb/cpu/internal/register/register_comparison_operators.h>
+#include <tanukigb/cpu/internal/register/register_flag_operations.h>
 #include <tanukigb/cpu/register_functionoid.h>
 #include <tanukigb/utility/concepts.h>
 #include <tanukigb/utility/integral.h>
