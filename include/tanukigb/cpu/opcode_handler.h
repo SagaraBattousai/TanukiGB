@@ -11,6 +11,7 @@
 #include <tanukigb/types/types.h>
 
 #include <array>
+#include <limits>
 #include <utility>
 
 // TODO: Remove iostream
@@ -18,29 +19,44 @@
 
 namespace tanukigb {
 
+template <Executor E,
+          opcode_type Num_Ops = std::numeric_limits<opcode_type>::max()>
+
+using JumpTable =
+    std::array<OpcodeExecutionFunctionPtr<E>, std::size_t(Num_Ops)>;
+
 namespace opcode_details {
-template <Executor E, opcode_type... Ops>
-constexpr auto GenerateJumpTable(std::integer_sequence<opcode_type, Ops...>) {
-  return std::array<OpcodeExecutionFunctionPtr<E>, sizeof...(Ops)> = {
-             (&OpcodeHandler<Ops>::template execute<E>)...};
+
+//template <Executor E, opcode_type... Ops>
+template <typename E, opcode_type... Ops>
+constexpr JumpTable<E, sizeof...(Ops)> GenerateJumpTable(
+    std::integer_sequence<opcode_type, Ops...>) {
+  return {(&OpcodeHandler<Ops>::template execute<E>)...};
 }
 
 }  // namespace opcode_details
 
-template <Executor E, opcode_type Num_Ops>
+//template <Executor E, opcode_type Num_Ops>
+template <typename E, opcode_type Num_Ops>
 constexpr auto GenerateJumpTable() {
-  return opcode_details::GenerateJumpTable(
+  return opcode_details::GenerateJumpTable<E>(
       std::make_integer_sequence<opcode_type, Num_Ops>{});
 }
+
+template <typename Underlying, OpcodeTag Tag>
+struct OpcodeHandlerCRTPBase {};
+
+
 template <byte_t Opcode>
 struct OpcodeHandler
-    : OpcodeHandlerCRTP<OpcodeHandler<Opcode>, opcode_tags::Other> {
+    : OpcodeHandlerCRTPBase<OpcodeHandler<Opcode>, opcode_tags::Other> {
   template <Executor E>
   static inline opcode_return_type execute(E& executor) {
     // TODO
-    return opcode_return_type{};
+    return Opcode;
   }
 };
+}  // namespace tanukigb
 
 #include <tanukigb/cpu/internal/opcode/16bit_arithmetic.h>
 #include <tanukigb/cpu/internal/opcode/16bit_load.h>
@@ -82,12 +98,7 @@ inline void load(byte_t& to, byte_t from) { to = from; }
   ldd  (HL),A      32         8 ---- (HL)=A, HL=HL-1
   ldd  A,(HL)      3A         8 ---- A=(HL), HL=HL-1
 
-GMB 16bit-Loadcommands
-  ld   rr,nn       x1 nn nn  12 ---- rr=nn (rr may be BC,DE,HL or SP)
-  ld   SP,HL       F9         8 ---- SP=HL
-  push rr          x5        16 ---- SP=SP-2  (SP)=rr   (rr may be
-BC,DE,HL,AF) pop  rr          x1        12 (AF) rr=(SP)  SP=SP+2   (rr may be
-BC,DE,HL,AF)
+
 
 GMB 8bit-Arithmetic/logical Commands
   add  A,r         8x         4 z0hc A=A+r
@@ -182,7 +193,6 @@ GMB Jumpcommands
  *
  *
  *
- */
-}  // namespace tanukigb
+*/
 
 #endif

@@ -1,13 +1,14 @@
 
 #include <tanukigb/cpu/cpu.h>
+#include <tanukigb/cpu/opcode_handler.h>
+#include <tanukigb/cpu/register.h>
 #include <tanukigb/cpu/register_set.h>
 #include <tanukigb/types/types.h>
-#include <tanukigb/cpu/opcode_handler.h>
 
 #include <array>
 #include <bit>
-#include <format>
 #include <cstring>
+#include <format>
 #include <iostream>
 #include <limits>
 #include <type_traits>
@@ -46,13 +47,6 @@ int main() {
   tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
   RunGameBoy(cpu);
   cpu.PrettyPrintRegisters(std::cout);
-
-  std::array<tanukigb::OpcodeExecutionFunctionPtr<int>, 1> arr = {
-    &tanukigb::OpcodeHandler<0x31>::template execute<int>
-  };
-
-  int x = 7;
-  arr[0](x);
 
   return 0;
 }

@@ -18,9 +18,23 @@
 
 namespace tanukigb {
 
+//I just spent two hours fixing something that wasnt broken (shouldnt rely solely on intelisence (ide) guesses
+//Always compile/print
+template <typename R, typename T>
+//concept RegisterLike = std::is_integral_v<T> && requires(std::decay_t<R> reg, T t) {
+concept RegisterLike = std::is_integral_v<T> && requires(R reg, T t) {
+  // Avoids having to specify whether its implicit or explicit (I think)
+  // std::convertible_to requires implicit and explicit and garuntees that the
+  // type is T not just convertible to T (std::convertible_to<A, C> can be true
+  // if A -> B -> C
+  { reg.operator T() } noexcept -> std::same_as<T>;
+  //{ reg.operator=(t) } noexcept -> std::same_as<T>;
+  { reg = t } noexcept -> std::same_as<T>;
+};
+
 namespace register_internal {
 constexpr auto kHexCharsPerByte = 2;
-}  // namespace internal
+}  // namespace register_internal
 
 /*******************************************************************************
  * Be careful with signed types to avoid overflow (Register could be restricted
@@ -41,8 +55,8 @@ class Register {
   ~Register() = default;
   Register(T) = delete;  // To avoid posibility of being
 
-  Register(const Register&) = delete;
-  Register(Register&&) = delete;
+  Register(const Register&) = delete;  // = default;  // delete;
+  Register(Register&&) = delete;       // default;       // delete;
 
   T operator=(T value) noexcept { return fnoid_(value); }
 
@@ -53,17 +67,51 @@ class Register {
   //
   // Now we have .Value lets try explicit again
   //
-  // I still prefer implicit even though it only saves writing .Value() in a relativly specific case (reading from an array). Would be interesting if we could use explicit (...) to work around this.
+  // I still prefer implicit even though it only saves writing .Value() in a
+  // relativly specific case (reading from an array). Would be interesting if we
+  // could use explicit (...) to work around this.
   //
   operator T() const noexcept { return fnoid_(); }
 
-  // Does not need to be a member but just a nice way to convert without calling .operatorT() in external code and
-  // potentially allows for making operator T() explicit and then clients can use Register.Value() as a nice replacement
+  // Does not need to be a member but just a nice way to convert without calling
+  // .operatorT() in external code and potentially allows for making operator
+  // T() explicit and then clients can use Register.Value() as a nice
+  // replacement
   T Value() const noexcept { return this->operator T(); }
 
  private:
   Functionoid fnoid_;
 };
+
+template <std::integral T>
+class Register<T, std::nullptr_t> {
+ public:
+  using value_type = T;
+  
+  Register() = default;
+  explicit Register(T value) : value_{value} {}
+  ~Register() = default;
+
+  Register(const Register&) = delete;
+  Register(Register&&) = delete;
+
+  T operator=(T value) noexcept {
+    value_ = value;
+   value_;
+  }
+
+  operator T() const noexcept { return value_; }
+
+  T Value() const noexcept { return this->operator T(); }
+
+ private:
+  T value_;
+};
+
+template <std::integral T>
+using RegisterWrapper = Register<T, std::nullptr_t>;
+
+
 
 template <std::integral T, RegisterFunctionoid<T> Functionoid>
 constexpr inline T ClearRegister(Register<T, Functionoid>& reg) {

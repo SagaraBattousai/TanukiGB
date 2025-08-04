@@ -10,12 +10,12 @@ namespace tanukigb {
 using opcode_return_type = int;
 using opcode_type = byte_t;
 
-template <Executor E>
+//template <Executor E>
+template <typename E>
 using OpcodeExecutionFunctionPtr = opcode_return_type (*)(E&);
 
-// Forward Declare CRTP (Not called base since we're using public inheritance)
 template <typename Underlying, OpcodeTag Tag>
-struct OpcodeHandlerCRTP;
+struct OpcodeHandlerCRTPBase;
 
 // Forward Declare actual Handler
 template <opcode_type Opcode>

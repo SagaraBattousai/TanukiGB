@@ -7,7 +7,7 @@
 namespace tanukigb {
 
 template <typename Underlying>
-struct OpcodeHandlerCRTP<Underlying, opcode_tags::Jump> {
+struct OpcodeHandlerCRTPBase<Underlying, opcode_tags::Jump> {
   template <Executor E>
   static inline opcode_return_type execute(E& executor) {
     // TODO: Do stuff

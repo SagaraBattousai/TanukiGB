@@ -7,7 +7,7 @@
 namespace tanukigb {
 
   template <typename Underlying>
-  struct OpcodeHandlerCRTP<Underlying, opcode_tags::Arithmetic16Bit> {
+  struct OpcodeHandlerCRTPBase<Underlying, opcode_tags::Arithmetic16Bit> {
     template <Executor E>
     static inline opcode_return_type execute(E& executor) {
       // TODO: Do stuff

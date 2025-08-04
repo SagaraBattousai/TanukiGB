@@ -36,8 +36,8 @@ template <typename Tag>
 concept OpcodeTag =
     one_of<Tag, opcode_tags::Load8Bit, opcode_tags::Load16Bit,
            opcode_tags::Arithmetic8Bit, opcode_tags::Arithmetic16Bit,
-           opcode_tags::RotateAndShift, opcode_tags::SingleBit, opcode_tags::Jump,
-           opcode_tags::Halt, opcode_tags::Other>
+           opcode_tags::RotateAndShift, opcode_tags::SingleBit,
+           opcode_tags::Jump, opcode_tags::Halt, opcode_tags::Other>;
 
 }  // namespace tanukigb
 #endif

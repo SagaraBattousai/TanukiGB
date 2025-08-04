@@ -1,43 +1,47 @@
 #ifndef __TANUKIGB_CPU_OPCODE_INTERNAL_OPCODE_16BIT_LOAD_H__
 #define __TANUKIGB_CPU_OPCODE_INTERNAL_OPCODE_16BIT_LOAD_H__
 
-#include <tanukigb/cpu/opcode_tags.h>
 #include <tanukigb/cpu/internal/opcode/opcode_handler_fwd_decls.h>
+#include <tanukigb/cpu/opcode_tags.h>
 
 namespace tanukigb {
 
 template <typename Underlying>
-struct OpcodeHandlerCRTP<Underlying, opcode_tags::Load16Bit> {
+struct OpcodeHandlerCRTPBase<Underlying, opcode_tags::Load16Bit> {
   template <Executor E>
   static inline opcode_return_type execute(E& executor) {
     // TODO: Do stuff
     // TODO: set up what 16bit loads should return
-    std::cout << "CRTP\n";
     Underlying::do_16bit_load(executor);
     // TODO: Other stuff
     return 0;
   }
 };
 
-
-  template <>
+template <>
 struct OpcodeHandler<0x31>
-    : OpcodeHandlerCRTP<OpcodeHandler<0x31>, opcode_tags::Load16Bit> {
-  template <typename Executor>
-  static inline opcode_return_type do_16bit_load(Executor& t) {
-    std::cout << "This Works: " << t << std::endl;
+    : OpcodeHandlerCRTPBase<OpcodeHandler<0x31>, opcode_tags::Load16Bit> {
+  template <Executor E>
+  static inline opcode_return_type do_16bit_load(E& exe) {
+    auto& sp = exe.template GetRegister<register_tags::SP>();
+    auto& pc = exe.template GetRegister<register_tags::PC>();
+
     // Todo: after MMU add helper as the postfix++ is mucky.
-    // registers_.SP = mmu_.Read(registers_.PC++) | mmu_.Read(registers_.PC++)
-    //                                                 << 8;
+    sp = exe.MemoryRead(pc++) | exe.MemoryRead(pc++) << 8;
     // registers_.PC() += 2;
     return 0;
   }
 };
 
+/*
+GMB 16bit-Loadcommands
+  ld   rr,nn       x1 nn nn  12 ---- rr=nn (rr may be BC,DE,HL or SP)
+  ld   SP,HL       F9         8 ---- SP=HL
+  push rr          x5        16 ---- SP=SP-2  (SP)=rr   (rr may be
+BC,DE,HL,AF) pop  rr          x1        12 (AF) rr=(SP)  SP=SP+2   (rr may be
+BC,DE,HL,AF)
+*/
 
-
-
-
-}
+}  // namespace tanukigb
 
 #endif
