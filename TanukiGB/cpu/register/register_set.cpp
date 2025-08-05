@@ -1,5 +1,5 @@
 
-#include <tanukigb/cpu/register_set.h>
+#include <tanukigb/cpu/register/register_set.h>
 #include <tanukigb/utility/endianness.h>
 
 namespace tanukigb {

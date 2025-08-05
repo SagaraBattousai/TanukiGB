@@ -2,15 +2,10 @@
 #define __TANUKIGB_UTILITY_PIMPL_H__
 
 #include <memory>
+#include <utility>
 
 namespace tanukigb {
 
-// Still unsure if this is correct in the way that it is, templates with imcomplete types
-// is sothething I need to look into more.
-
-// May need to move implmentation to pimpl_impl.h
-// However I think, so long as we dont call any of these functions while Impl is undefined, it's
-// safe to leave it in one file.
 template<typename Impl>
 class Pimpl {
  public:

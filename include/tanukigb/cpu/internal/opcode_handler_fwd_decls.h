@@ -2,7 +2,7 @@
 #define __TANUKIGB_CPU_INTERNAL_OPCODE_OPCODE_HANDLER_FWD_DECLS_H__
 
 #include <tanukigb/types/types.h>
-#include <tanukigb/cpu/executor.h>
+//#include <tanukigb/cpu/executor.h>
 #include <tanukigb/cpu/opcode_tags.h>
 
 namespace tanukigb {

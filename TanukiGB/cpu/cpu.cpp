@@ -1,6 +1,6 @@
 #include <tanukigb/cpu/cpu.h>
 #include <tanukigb/cpu/opcode_handler.h>
-#include <tanukigb/cpu/register_set.h>
+#include <tanukigb/cpu/register/register_set.h>
 #include <tanukigb/memory/mmu.h>
 #include <tanukigb/types/types.h>
 #include <tanukigb/utility/enum_utils.h>
@@ -11,103 +11,18 @@
 
 namespace tanukigb {
 
-class Cpu::CpuImpl {
- public:
-  enum class RegisterFlags : byte_t {
-    Z = (1 << 7),
-    N = (1 << 6),
-    H = (1 << 5),
-    C = (1 << 4)
-  };
-
-  CpuImpl(MMU&& mmu) : mmu_{std::move(mmu)}, registers_{} {};
-
-  int Run();
-
-  std::ostream& PrintRegisters(std::ostream& os) const {
-    return (os << registers_ << std::endl);
-  }
-
-  std::ostream& PrettyPrintRegisters(std::ostream& os) const {
-    return tanukigb::PrettyPrintRegisters(os, registers_);
-  }
-
-  byte_t MemoryRead(word_t addr) const { return mmu_.Read(addr); }
-
-  template <RegisterTag Tag>
-  constexpr decltype(auto) GetRegister() noexcept {
-    return registers_.template GetRegister<Tag>();
-  }
-
-  template <RegisterTag Tag>
-  constexpr auto& GetRegister() const noexcept {
-    return registers_.GetRegister<Tag>();
-  }
-
- private:  // Most functions can be private since this is a Pimpl's Impl
-  bool IsZFlagSet() const noexcept {
-    return IsFlagSet<RegisterFlags, RegisterFlags::Z>(
-        GetRegister<register_tags::F>());
-  }
-  bool IsNFlagSet() const noexcept {
-    return IsFlagSet<RegisterFlags, RegisterFlags::N>(
-        GetRegister<register_tags::F>());
-  }
-  bool IsHFlagSet() const noexcept {
-    return IsFlagSet<RegisterFlags, RegisterFlags::H>(
-        GetRegister<register_tags::F>());
-  }
-  bool IsCFlagSet() const noexcept {
-    return IsFlagSet<RegisterFlags, RegisterFlags::C>(
-        GetRegister<register_tags::F>());
-  }
-
-  template <typename T>
-  using OpcodeHandlerFunc = void(T&);
-
-  template <typename T>
-  using OpcodeHandlerFuncPtr = void (*)(T&);
-
- /*static constexpr auto jump_table_ =
-      []() constexpr noexcept {
-    return GenerateJumpTable<CpuImpl, 255>();
-  }();*/
-
-  MMU mmu_;
-  RegisterSet registers_;
-};
-
-Cpu::Cpu(Pimpl<CpuImpl>&& impl) : impl_(std::move(impl)) {}
-Cpu::~Cpu() = default;
-
-Cpu::Cpu(Cpu&&) = default;
-Cpu& Cpu::operator=(Cpu&&) = default;
-
-Cpu Cpu::GameboyCpu() { return Cpu(Pimpl<CpuImpl>(MMU::GameboyMMU())); }
-Cpu Cpu::ColourGameboyCpu() {
-  return Cpu(Pimpl<CpuImpl>(MMU::ColourGameboyMMU()));
-}
-
-int Cpu::Run() { return impl_->Run(); }
-
-inline std::ostream& Cpu::PrintRegisters(std::ostream& os) const {
-  return impl_->PrintRegisters(os);
-}
-
-inline std::ostream& Cpu::PrettyPrintRegisters(std::ostream& os) const {
-  return impl_->PrettyPrintRegisters(os);
+Cpu Cpu::GameboyCpu() { return Cpu(MMU::GameboyMMU()); }
+Cpu Cpu::ColourGameboyCpu() { return Cpu(MMU::ColourGameboyMMU());
 }
 
 // TODO:
-int Cpu::CpuImpl::Run() {
+int Cpu::Run() {
   int retcode = 0;
   auto& PC = GetRegister<register_tags::PC>();
   while (true) {
     byte_t opcode = mmu_.Read(PC);
     PC++;
-
-    retcode = 7;
-    //jump_table_[opcode](*this);
+    retcode = jump_table[opcode](*this);
     if (retcode != 0) {
       break;
     }

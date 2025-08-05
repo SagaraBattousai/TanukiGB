@@ -1,11 +1,11 @@
 #ifndef __TANUKIGB_CPU_REGISTER_H__
 #define __TANUKIGB_CPU_REGISTER_H__
 
-#include <tanukigb/cpu/internal/register/register_arithmetic_operators.h>
-#include <tanukigb/cpu/internal/register/register_bitwise_operators.h>
-#include <tanukigb/cpu/internal/register/register_comparison_operators.h>
-#include <tanukigb/cpu/internal/register/register_flag_operations.h>
-#include <tanukigb/cpu/register_functionoid.h>
+#include <tanukigb/cpu/register/internal/register_arithmetic_operators.h>
+#include <tanukigb/cpu/register/internal/register_bitwise_operators.h>
+#include <tanukigb/cpu/register/internal/register_comparison_operators.h>
+#include <tanukigb/cpu/register/internal/register_flag_operations.h>
+#include <tanukigb/cpu/register/register_functionoid.h>
 #include <tanukigb/utility/concepts.h>
 #include <tanukigb/utility/integral.h>
 
@@ -18,18 +18,13 @@
 
 namespace tanukigb {
 
-//I just spent two hours fixing something that wasnt broken (shouldnt rely solely on intelisence (ide) guesses
-//Always compile/print
 template <typename R, typename T>
-//concept RegisterLike = std::is_integral_v<T> && requires(std::decay_t<R> reg, T t) {
 concept RegisterLike = std::is_integral_v<T> && requires(R reg, T t) {
   // Avoids having to specify whether its implicit or explicit (I think)
-  // std::convertible_to requires implicit and explicit and garuntees that the
-  // type is T not just convertible to T (std::convertible_to<A, C> can be true
-  // if A -> B -> C
   { reg.operator T() } noexcept -> std::same_as<T>;
-  //{ reg.operator=(t) } noexcept -> std::same_as<T>;
-  { reg = t } noexcept -> std::same_as<T>;
+  
+  // Just needs to be assignable from a type t, we'll never chain them
+  { reg = t } noexcept;// -> std::same_as<T>;
 };
 
 namespace register_internal {

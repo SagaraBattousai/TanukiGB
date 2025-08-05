@@ -7,6 +7,7 @@ set(header_files
     "${utility_MODULE_ROOT}/enum_flag_utils.h"
     "${utility_MODULE_ROOT}/integral.h"
     "${utility_MODULE_ROOT}/pimpl.h"
+    "${utility_MODULE_ROOT}/crtp.h"
     # "${utility_MODULE_ROOT}/property.h"
     )
 

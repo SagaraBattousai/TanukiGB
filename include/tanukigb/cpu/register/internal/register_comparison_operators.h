@@ -1,7 +1,7 @@
 #ifndef __TANUKIGB_CPU_INTERNAL_REGISTER_REGISTER_COMPARISON_OPERATORS_H__
 #define __TANUKIGB_CPU_INTERNAL_REGISTER_REGISTER_COMPARISON_OPERATORS_H__
 
-#include <tanukigb/cpu/register_functionoid.h>
+#include <tanukigb/cpu/register/register_functionoid.h>
 
 #include <compare>
 #include <concepts>

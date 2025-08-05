@@ -1,8 +1,8 @@
 
 #include <tanukigb/cpu/cpu.h>
 #include <tanukigb/cpu/opcode_handler.h>
-#include <tanukigb/cpu/register.h>
-#include <tanukigb/cpu/register_set.h>
+#include <tanukigb/cpu/register/register.h>
+#include <tanukigb/cpu/register/register_set.h>
 #include <tanukigb/types/types.h>
 
 #include <array>

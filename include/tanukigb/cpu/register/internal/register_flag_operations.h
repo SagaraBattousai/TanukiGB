@@ -1,7 +1,7 @@
 #ifndef __TANUKIGB_CPU_INTERNAL_REGISTER_REGISTER_FLAG_OPERATIONS_H__
 #define __TANUKIGB_CPU_INTERNAL_REGISTER_REGISTER_FLAG_OPERATIONS_H__
 
-#include <tanukigb/cpu/register_functionoid.h>
+#include <tanukigb/cpu/register/register_functionoid.h>
 #include <tanukigb/utility/concepts.h>
 #include <tanukigb/utility/enum_utils.h>
 

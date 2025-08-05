@@ -2,38 +2,84 @@
 #define __TANUKIGB_CPU_CPU_H__
 
 #include <_TanukiGB_config.h>
+#include <tanukigb/cpu/executor.h>
+#include <tanukigb/cpu/opcode_handler.h>
+#include <tanukigb/cpu/register/register.h>
+#include <tanukigb/cpu/register/register_set.h>
+#include <tanukigb/memory/mmu.h>
 
-#include <tanukigb/utility/pimpl.h>
+#include <ostream>
+#include <utility>
 
 namespace tanukigb {
-class Cpu {
+
+class Cpu : public Executor<Cpu> {
  public:
   static TANUKIGB_EXPORT Cpu GameboyCpu();
   static TANUKIGB_EXPORT Cpu ColourGameboyCpu();
 
-  // The following Constructors, destructors and operator='s
-  // Must be defined (=default) in the impl file as we're using Pimpl 
-  TANUKIGB_EXPORT  ~Cpu();
-  TANUKIGB_EXPORT Cpu(Cpu&&);
-  TANUKIGB_EXPORT Cpu& operator=(Cpu&&);
-
+  TANUKIGB_EXPORT ~Cpu() = default;
+  Cpu(Cpu&&) = delete;
+  Cpu& operator=(Cpu&&) = delete;
 
   // The following copy functions (Constructor and operator=) are deleted
   //  for now
   Cpu(const Cpu&) = delete;
   Cpu& operator=(const Cpu&) = delete;
 
-
   TANUKIGB_EXPORT int Run();
-  TANUKIGB_EXPORT std::ostream& PrintRegisters(std::ostream& os) const;
-  TANUKIGB_EXPORT std::ostream& PrettyPrintRegisters(std::ostream& os) const;
+
+  TANUKIGB_EXPORT std::ostream& PrintRegisters(std::ostream& os) const {
+    return (os << registers_ << std::endl);
+  }
+
+  TANUKIGB_EXPORT std::ostream& PrettyPrintRegisters(std::ostream& os) const {
+    return tanukigb::PrettyPrintRegisters(os, registers_);
+  }
+
+  TANUKIGB_EXPORT byte_t MemoryRead(word_t addr) const noexcept{
+    return mmu_.Read(addr);
+  }
+
+  template <RegisterTag Tag>
+  constexpr decltype(auto) GetRegister() noexcept {
+    return registers_.template GetRegister<Tag>();
+  }
+
+  template <RegisterTag Tag>
+  constexpr auto& GetRegister() const noexcept {
+    return registers_.GetRegister<Tag>();
+  }
 
  private:
-  class CpuImpl;
+  enum class RegisterFlags : byte_t {
+    Z = (1 << 7),
+    N = (1 << 6),
+    H = (1 << 5),
+    C = (1 << 4)
+  };
 
-  Cpu(Pimpl<CpuImpl>&&);
+  Cpu(MMU&& mmu) : mmu_{std::move(mmu)}, registers_{} {};
 
-  Pimpl<CpuImpl> impl_;
+  bool IsZFlagSet() const noexcept {
+    return IsFlagSet<RegisterFlags, RegisterFlags::Z>(
+        registers_.GetRegister<register_tags::F>());
+  }
+  bool IsNFlagSet() const noexcept {
+    return IsFlagSet<RegisterFlags, RegisterFlags::N>(
+        registers_.GetRegister<register_tags::F>());
+  }
+  bool IsHFlagSet() const noexcept {
+    return IsFlagSet<RegisterFlags, RegisterFlags::H>(
+        registers_.GetRegister<register_tags::F>());
+  }
+  bool IsCFlagSet() const noexcept {
+    return IsFlagSet<RegisterFlags, RegisterFlags::C>(
+        registers_.GetRegister<register_tags::F>());
+  }
+
+  MMU mmu_;
+  RegisterSet registers_;
 };
 
 }  // namespace tanukigb

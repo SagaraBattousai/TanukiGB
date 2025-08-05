@@ -1,6 +1,6 @@
 
 #include <gtest/gtest.h>
-#include <tanukigb/cpu/register_set.h>
+#include <tanukigb/cpu/register/register_set.h>
 
 #include <type_traits>
 

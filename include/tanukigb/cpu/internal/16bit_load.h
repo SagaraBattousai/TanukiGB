@@ -1,14 +1,15 @@
 #ifndef __TANUKIGB_CPU_OPCODE_INTERNAL_OPCODE_16BIT_LOAD_H__
 #define __TANUKIGB_CPU_OPCODE_INTERNAL_OPCODE_16BIT_LOAD_H__
 
-#include <tanukigb/cpu/internal/opcode/opcode_handler_fwd_decls.h>
+#include <tanukigb/cpu/register_tags.h>
+#include <tanukigb/cpu/internal/opcode_handler_fwd_decls.h>
 #include <tanukigb/cpu/opcode_tags.h>
 
 namespace tanukigb {
 
 template <typename Underlying>
 struct OpcodeHandlerCRTPBase<Underlying, opcode_tags::Load16Bit> {
-  template <Executor E>
+  template <typename E>
   static inline opcode_return_type execute(E& executor) {
     // TODO: Do stuff
     // TODO: set up what 16bit loads should return
@@ -21,7 +22,7 @@ struct OpcodeHandlerCRTPBase<Underlying, opcode_tags::Load16Bit> {
 template <>
 struct OpcodeHandler<0x31>
     : OpcodeHandlerCRTPBase<OpcodeHandler<0x31>, opcode_tags::Load16Bit> {
-  template <Executor E>
+  template <typename E>
   static inline opcode_return_type do_16bit_load(E& exe) {
     auto& sp = exe.template GetRegister<register_tags::SP>();
     auto& pc = exe.template GetRegister<register_tags::PC>();

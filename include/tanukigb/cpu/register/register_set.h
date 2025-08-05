@@ -2,8 +2,8 @@
 #define __TANUKIGB_CPU_REGISTER_SET_H__
 
 #include <_TanukiGB_config.h>
-#include <tanukigb/cpu/register.h>
-#include <tanukigb/cpu/register_set_functionoid.h>
+#include <tanukigb/cpu/register/register.h>
+#include <tanukigb/cpu/register/register_set_functionoid.h>
 #include <tanukigb/types/types.h>
 
 // TODO: A) Work out if this implementing Executor is okay, B) cant be asked to

@@ -5,8 +5,8 @@
 // bespoky (I love this pattern but I dont have time to waste trying to do so,
 // its so awesome though).
 
-#include <tanukigb/cpu/executor.h>
-#include <tanukigb/cpu/internal/opcode/opcode_handler_fwd_decls.h>
+//#include <tanukigb/cpu/executor.h>
+#include <tanukigb/cpu/internal/opcode_handler_fwd_decls.h>
 #include <tanukigb/cpu/opcode_tags.h>
 #include <tanukigb/types/types.h>
 
@@ -19,9 +19,8 @@
 
 namespace tanukigb {
 
-template <Executor E,
+template <typename E,
           opcode_type Num_Ops = std::numeric_limits<opcode_type>::max()>
-
 using JumpTable =
     std::array<OpcodeExecutionFunctionPtr<E>, std::size_t(Num_Ops)>;
 
@@ -50,7 +49,7 @@ struct OpcodeHandlerCRTPBase {};
 template <byte_t Opcode>
 struct OpcodeHandler
     : OpcodeHandlerCRTPBase<OpcodeHandler<Opcode>, opcode_tags::Other> {
-  template <Executor E>
+  template <typename E>
   static inline opcode_return_type execute(E& executor) {
     // TODO
     return Opcode;
@@ -58,13 +57,13 @@ struct OpcodeHandler
 };
 }  // namespace tanukigb
 
-#include <tanukigb/cpu/internal/opcode/16bit_arithmetic.h>
-#include <tanukigb/cpu/internal/opcode/16bit_load.h>
-#include <tanukigb/cpu/internal/opcode/8bit_arithmetic.h>
-#include <tanukigb/cpu/internal/opcode/8bit_load.h>
-#include <tanukigb/cpu/internal/opcode/jump.h>
-#include <tanukigb/cpu/internal/opcode/rotate_and_shift.h>
-#include <tanukigb/cpu/internal/opcode/single_bit.h>
+#include <tanukigb/cpu/internal/16bit_arithmetic.h>
+#include <tanukigb/cpu/internal/16bit_load.h>
+#include <tanukigb/cpu/internal/8bit_arithmetic.h>
+#include <tanukigb/cpu/internal/8bit_load.h>
+#include <tanukigb/cpu/internal/jump.h>
+#include <tanukigb/cpu/internal/rotate_and_shift.h>
+#include <tanukigb/cpu/internal/single_bit.h>
 
 // template <typename T, byte_t... IS>
 // constexpr std::array<OpcodeHandlerFuncPtr<T>, sizeof...(IS)> GenJumpTable()
