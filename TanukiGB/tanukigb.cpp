@@ -3,6 +3,8 @@
 #include <tanukigb/cpu/opcode_handler.h>
 #include <tanukigb/cpu/register/register.h>
 #include <tanukigb/cpu/register/register_set.h>
+#include <tanukigb/cpu/register/register_type.h>
+#include <tanukigb/cpu/register_tags.h>
 #include <tanukigb/types/types.h>
 
 #include <array>
@@ -47,6 +49,13 @@ int main() {
   tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
   RunGameBoy(cpu);
   cpu.PrettyPrintRegisters(std::cout);
+
+  tanukigb::RegisterSet rs{};
+
+  auto& ra = rs.GetRegister<tanukigb::register_tags::A>();
+
+  std::cout << std::boolalpha
+            << tanukigb::RegisterType<const volatile decltype(ra), 8> << std::endl;
 
   return 0;
 }

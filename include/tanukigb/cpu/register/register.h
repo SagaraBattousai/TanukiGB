@@ -18,15 +18,6 @@
 
 namespace tanukigb {
 
-template <typename R, typename T>
-concept RegisterLike = std::is_integral_v<T> && requires(R reg, T t) {
-  // Avoids having to specify whether its implicit or explicit (I think)
-  { reg.operator T() } noexcept -> std::same_as<T>;
-  
-  // Just needs to be assignable from a type t, we'll never chain them
-  { reg = t } noexcept;// -> std::same_as<T>;
-};
-
 namespace register_internal {
 constexpr auto kHexCharsPerByte = 2;
 }  // namespace register_internal

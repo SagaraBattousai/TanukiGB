@@ -42,19 +42,6 @@ concept RegisterTag =
            register_tags::PC, register_tags::AF, register_tags::BC,
            register_tags::DE, register_tags::HL>;
 
-template <typename Tag>
-concept RegisterTag8Bit =
-    std::derived_from<Tag, register_tags::groups::Reg8Bit> && RegisterTag<Tag>;
-
-template <typename Tag>
-concept RegisterTag16Bit =
-    std::derived_from<Tag, register_tags::groups::Reg16Bit> && RegisterTag<Tag>;
-
-template <typename Tag>
-concept RegisterTagComposite =
-    std::derived_from<Tag, register_tags::groups::RegComposite> &&
-    RegisterTag<Tag>;
-
 }  // namespace tanukigb
 
 #endif

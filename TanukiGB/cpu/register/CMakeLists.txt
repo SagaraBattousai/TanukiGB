@@ -5,6 +5,7 @@ set(cpp_sources "register_set.cpp")
 set(c_sources "")
 set(register_module
     "${register_MODULE_ROOT}/register.h"
+    "${register_MODULE_ROOT}/register_type.h"
     "${register_MODULE_ROOT}/register_functionoid.h"
     "${register_MODULE_ROOT}/register_set.h"
     "${register_MODULE_ROOT}/register_set_functionoid.h")
