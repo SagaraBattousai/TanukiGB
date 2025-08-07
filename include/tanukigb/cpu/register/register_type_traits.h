@@ -7,17 +7,22 @@
 
 namespace tanukigb {
 
-// Defined first as Concept (RegisterType) not required here thanks to SFINAE (I
-// think)
+// Okay so this makes it SFINAE safe (when I've finished my paper I'd like to
+// understand this better and the cases around friendly...)
+//
+// Cant seem to replace the SFINAE with Concepts (maybe this is the corner
+// case?) Read up on this later!
+//
+// I guess the easiest case would be to constrain the register_traits with
+// RegisterType?
+//
+template <typename R, typename = void>
+struct register_traits {};
 
-//Cant get the value_type part working!!!!
-// Have to pass remove_reference_t or remove cv_ref_t to this, cant have it on
-// the inside....... Maybe not!! In fact im so confused and ChatGPT doesnt
-// either
 template <typename R>
-struct register_traits {
-  // using value_type = typename std::remove_reference_t<R>::value_type;
-  using value_type = typename R::value_type;
+struct register_traits<
+    R, std::void_t<typename std::remove_reference_t<R>::value_type>> {
+  using value_type = typename std::remove_reference_t<R>::value_type;
 
   static constexpr std::size_t bit_width = sizeof(value_type) * CHAR_BIT;
 
@@ -25,18 +30,12 @@ struct register_traits {
   struct has_at_least_bits : std::bool_constant<(bit_width >= N)> {};
 };
 
-// TODO rename to register_value_t (like iterator traits style)
 template <typename R>
-// using register_value_type = typename register_traits<R>::value_type;
-using register_value_type = typename register_traits<std::remove_reference_t<R>>::value_type;
-
-// Additional helpers (by leaving out of struct it saves typing :)
+using register_value_t = typename register_traits<R>::value_type;
 
 template <typename R, std::size_t N>
 using register_has_at_least_bits =
-    typename register_traits<R>::template has_at_least_bits<N>;
-// typename register_traits<std::remove_reference_t<R>> ::template
-// has_at_least_bits<N>;
+    register_traits<R>::template has_at_least_bits<N>;
 
 template <typename R, std::size_t N>
 inline constexpr bool register_has_at_least_bits_v =

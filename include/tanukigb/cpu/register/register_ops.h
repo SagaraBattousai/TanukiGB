@@ -38,7 +38,7 @@ constexpr inline auto FillRegister(Register& reg) {
 // their value as a signed integer.
 template <RegisterType Register>
 constexpr inline auto AsSigned(Register& lhs) {
-  return signed_cast(lhs.operator typename std::remove_reference_t<Register>::value_type());
+  return signed_cast(lhs.operator register_value_t<Register>());
 }
 
 // Less important Non-Friend Non-Member that enables signed registers (which is
@@ -46,12 +46,12 @@ constexpr inline auto AsSigned(Register& lhs) {
 // integer.
 template <RegisterType Register>
 constexpr inline auto AsUnsigned(Register& lhs) {
-  return unsigned_cast(lhs.operator typename std::remove_reference_t<Register>::value_type());
+  return unsigned_cast(lhs.operator register_value_t<Register>());
 }
 
 template <RegisterType Register>
 std::ostream& operator<<(std::ostream& os, const Register& obj) {
-  using T = typename std::remove_reference_t<Register>::value_type;
+  using T = register_value_t<Register>;
   os << std::format("{:#0{}x}", obj.operator T(),
                     (1 + sizeof(T)) * register_ops_internal::kHexCharsPerByte);
   return os;

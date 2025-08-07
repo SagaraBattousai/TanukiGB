@@ -23,7 +23,7 @@ namespace tanukigb {
 template <RegisterType Register, RegisterType OtherRegister>
 inline std::strong_ordering operator<=>(const Register& lhs,
                                         const OtherRegister& rhs) {
-  return (lhs.operator typename std::remove_reference_t<Register>::value_type() <=>
+  return (lhs.operator register_value_t<Register>() <=>
           rhs.operator typename std::remove_reference_t<OtherRegister>::value_type);
 }
 

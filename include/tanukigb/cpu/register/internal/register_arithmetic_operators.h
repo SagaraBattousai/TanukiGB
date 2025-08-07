@@ -21,88 +21,83 @@ namespace tanukigb {
 // versions but ...
 
 template <std::integral T, RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator+(const Register& lhs,
-                                                         T rhs) {
-  return ((lhs.operator typename std::remove_reference_t<Register>::value_type()) + rhs);
+constexpr inline register_value_t<Register> operator+(const Register& lhs,
+                                                      T rhs) {
+  return ((lhs.operator register_value_t<Register>()) + rhs);
 }
 
 template <std::integral T, RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator+=(Register& lhs,
-                                                          T rhs) {
+constexpr inline register_value_t<Register> operator+=(Register& lhs, T rhs) {
   return (lhs = operator+(lhs, rhs));
 }
 
 template <std::integral T, RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator-(const Register& lhs,
-                                                         T rhs) {
-  return (lhs.operator typename std::remove_reference_t<Register>::value_type() - rhs);
+constexpr inline register_value_t<Register> operator-(const Register& lhs,
+                                                      T rhs) {
+  return (lhs.operator register_value_t<Register>() - rhs);
 }
 
 template <std::integral T, RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator-=(Register& lhs,
-                                                          T rhs) {
+constexpr inline register_value_t<Register> operator-=(Register& lhs, T rhs) {
   return (lhs = operator-(lhs, rhs));
 }
 
 template <std::integral T, RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator*(const Register& lhs,
-                                                         T rhs) {
-  return (lhs.operator typename std::remove_reference_t<Register>::value_type() * rhs);
+constexpr inline register_value_t<Register> operator*(const Register& lhs,
+                                                      T rhs) {
+  return (lhs.operator register_value_t<Register>() * rhs);
 }
 
 template <std::integral T, RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator*=(Register& lhs,
-                                                          T rhs) {
+constexpr inline register_value_t<Register> operator*=(Register& lhs, T rhs) {
   return (lhs = operator*(lhs, rhs));
 }
 
 template <std::integral T, RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator/(const Register& lhs,
-                                                         T rhs) {
-  return (lhs.operator typename std::remove_reference_t<Register>::value_type() / rhs);
+constexpr inline register_value_t<Register> operator/(const Register& lhs,
+                                                      T rhs) {
+  return (lhs.operator register_value_t<Register>() / rhs);
 }
 
 template <std::integral T, RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator/=(Register& lhs,
-                                                          T rhs) {
+constexpr inline register_value_t<Register> operator/=(Register& lhs, T rhs) {
   return (lhs = operator/(lhs, rhs));
 }
 
 template <std::integral T, RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator%(const Register& lhs,
-                                                         T rhs) {
-  return (lhs.operator typename std::remove_reference_t<Register>::value_type() % rhs);
+constexpr inline register_value_t<Register> operator%(const Register& lhs,
+                                                      T rhs) {
+  return (lhs.operator register_value_t<Register>() % rhs);
 }
 
 template <std::integral T, RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator%=(Register& lhs,
-                                                          T rhs) {
+constexpr inline register_value_t<Register> operator%=(Register& lhs, T rhs) {
   return (lhs = operator%(lhs, rhs));
 }
 
 // Although it makes sence and is possible to return Register& here, for
-// symetry it returns typename std::remove_reference_t<Register>::value_type just as postfix does since
-// postfix cannot return Register&
+// symetry it returns register_value_t<Register>
+// just as postfix does since postfix cannot return Register&
 
 template <RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator++(Register& reg) {
+constexpr inline register_value_t<Register> operator++(Register& reg) {
   return operator+=(reg, 1);
 }
 
 template <RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator++(Register& reg, int) {
-  auto old = reg.operator typename std::remove_reference_t<Register>::value_type();
+constexpr inline register_value_t<Register> operator++(Register& reg, int) {
+  auto old = reg.operator register_value_t<Register>();
   operator++(reg);
   return old;
 }
 template <RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator--(Register& reg) {
+constexpr inline register_value_t<Register> operator--(Register& reg) {
   return operator-=(reg, 1);
 }
 
 template <RegisterType Register>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator--(Register& reg, int) {
-  auto old = reg.operator typename std::remove_reference_t<Register>::value_type();
+constexpr inline register_value_t<Register> operator--(Register& reg, int) {
+  auto old = reg.operator register_value_t<Register>();
   operator--(reg);
   return old;
 }
@@ -111,66 +106,66 @@ constexpr inline typename std::remove_reference_t<Register>::value_type operator
 // same/wrappers to the above)
 
 template <std::integral T, RegisterType Register, RegisterType OtherRegister>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator+(
+constexpr inline register_value_t<Register> operator+(
     const Register& lhs, const OtherRegister& rhs) {
-  return ((lhs.operator typename std::remove_reference_t<Register>::value_type()) +
-          rhs.operator typename std::remove_reference_t<Register>::value_type());
+  return ((lhs.operator register_value_t<Register>()) +
+          rhs.operator register_value_t<Register>());
 }
 
 template <std::integral T, RegisterType Register, RegisterType OtherRegister>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator+=(
+constexpr inline register_value_t<Register> operator+=(
     Register& lhs, const OtherRegister& rhs) {
   return (lhs = operator+(lhs, rhs));
 }
 
 template <std::integral T, RegisterType Register, RegisterType OtherRegister>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator-(
+constexpr inline register_value_t<Register> operator-(
     const Register& lhs, const OtherRegister& rhs) {
-  return (lhs.operator typename std::remove_reference_t<Register>::value_type() -
-          rhs.operator typename std::remove_reference_t<Register>::value_type());
+  return (lhs.operator register_value_t<Register>() -
+          rhs.operator register_value_t<Register>());
 }
 
 template <std::integral T, RegisterType Register, RegisterType OtherRegister>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator-=(
+constexpr inline register_value_t<Register> operator-=(
     Register& lhs, const OtherRegister& rhs) {
   return (lhs = operator-(lhs, rhs));
 }
 
 template <std::integral T, RegisterType Register, RegisterType OtherRegister>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator*(
+constexpr inline register_value_t<Register> operator*(
     const Register& lhs, const OtherRegister& rhs) {
-  return (lhs.operator typename std::remove_reference_t<Register>::value_type() *
-          rhs.operator typename std::remove_reference_t<Register>::value_type());
+  return (lhs.operator register_value_t<Register>() *
+          rhs.operator register_value_t<Register>());
 }
 
 template <std::integral T, RegisterType Register, RegisterType OtherRegister>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator*=(
+constexpr inline register_value_t<Register> operator*=(
     Register& lhs, const OtherRegister& rhs) {
   return (lhs = operator*(lhs, rhs));
 }
 
 template <std::integral T, RegisterType Register, RegisterType OtherRegister>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator/(
+constexpr inline register_value_t<Register> operator/(
     const Register& lhs, const OtherRegister& rhs) {
-  return (lhs.operator typename std::remove_reference_t<Register>::value_type() /
-          rhs.operator typename std::remove_reference_t<Register>::value_type());
+  return (lhs.operator register_value_t<Register>() /
+          rhs.operator register_value_t<Register>());
 }
 
 template <std::integral T, RegisterType Register, RegisterType OtherRegister>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator/=(
+constexpr inline register_value_t<Register> operator/=(
     Register& lhs, const OtherRegister& rhs) {
   return (lhs = operator/(lhs, rhs));
 }
 
 template <std::integral T, RegisterType Register, RegisterType OtherRegister>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator%(
+constexpr inline register_value_t<Register> operator%(
     const Register& lhs, const OtherRegister& rhs) {
-  return (lhs.operator typename std::remove_reference_t<Register>::value_type() %
-          rhs.operator typename std::remove_reference_t<Register>::value_type());
+  return (lhs.operator register_value_t<Register>() %
+          rhs.operator register_value_t<Register>());
 }
 
 template <std::integral T, RegisterType Register, RegisterType OtherRegister>
-constexpr inline typename std::remove_reference_t<Register>::value_type operator%=(
+constexpr inline register_value_t<Register> operator%=(
     Register& lhs, const OtherRegister& rhs) {
   return (lhs = operator%(lhs, rhs));
 }
