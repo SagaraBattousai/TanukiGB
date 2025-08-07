@@ -1,5 +1,10 @@
-#ifndef __TANUKIGB_CPU_REGISTER_TYPE_H__
-#define __TANUKIGB_CPU_REGISTER_TYPE_H__
+#ifndef __TANUKIGB_CPU_REGISTER_REGISTER_TYPE_TRAITS_H__
+#define __TANUKIGB_CPU_REGISTER_REGISTER_TYPE_TRAITS_H__
+
+// TODO: Remove
+#include <tanukigb/cpu/register/register.h>
+#include <tanukigb/cpu/register/register_set.h>
+#include <tanukigb/types/types.h>
 
 #include <climits>
 #include <concepts>
@@ -9,9 +14,14 @@ namespace tanukigb {
 
 // Defined first as Concept (RegisterType) not required here thanks to SFINAE (I
 // think)
+
+// Have to pass remove_reference_t or remove cv_ref_t to this, cant have it on
+// the inside....... Maybe not!! In fact im so confused and ChatGPT doesnt
+// either
 template <typename R>
 struct register_traits {
   using value_type = typename std::remove_reference_t<R>::value_type;
+  // using value_type = typename R::value_type;
 
   static constexpr std::size_t bit_width = sizeof(value_type) * CHAR_BIT;
 
@@ -19,15 +29,22 @@ struct register_traits {
   struct has_at_least_bits : std::bool_constant<(bit_width >= N)> {};
 };
 
+// TODO rename to register_value_t (like iterator traits style)
+template <typename R>
+using register_value_type = typename register_traits<R>::value_type;
+// typename register_traits<std::remove_reference_t<R>>::value_type;
+
 // Additional helpers (by leaving out of struct it saves typing :)
 
 template <typename R, std::size_t N>
 using register_has_at_least_bits =
     typename register_traits<R>::template has_at_least_bits<N>;
+// typename register_traits<std::remove_reference_t<R>> ::template
+// has_at_least_bits<N>;
 
 template <typename R, std::size_t N>
 inline constexpr bool register_has_at_least_bits_v =
-    register_has_at_least_bits<R, N>::value;
+    register_has_at_least_bits<std::remove_reference_t<R>, N>::value;
 
 template <typename R>
 inline constexpr bool register_has_at_least_8_bits =
@@ -53,15 +70,19 @@ inline constexpr bool register_has_at_least_64_bits =
 
 template <typename R>
 concept RegisterType =
-    requires(R reg, std::remove_reference_t<R>::value_type vt) {
-      std::is_integral_v<typename register_traits<R>::value_type>;
-      // requires an implicit (direct) conversion to value_type
-      {
-        reg.operator register_traits<R>::value_type()
-      } noexcept -> std::same_as<typename register_traits<R>::value_type>;
-
-      { reg = vt } noexcept;
-    };
+    std::is_same_v<Register<word_t, RegisterSetFnoid<word_t>>,
+                   std::remove_cvref_t<R>>;
+// concept RegisterType = requires(
+//     R reg, typename std::remove_reference_t<R>::value_type vt) {
+//   std::is_integral_v<typename std::remove_reference_t<R>::value_type>;
+//   // requires an implicit (direct) conversion to value_type
+//   {
+//     reg.operator std::remove_reference_t<R>::value_type()
+//   } noexcept -> std::same_as<typename
+//   std::remove_reference_t<R>::value_type>;
+//
+//   { reg = vt } noexcept;
+// };
 
 }  // namespace tanukigb
 #endif

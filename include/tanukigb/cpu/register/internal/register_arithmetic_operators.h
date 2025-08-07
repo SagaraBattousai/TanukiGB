@@ -1,14 +1,11 @@
-#ifndef __TANUKIGB_CPU_INTERNAL_REGISTER_REGISTER_ARITHMETIC_OPERATORS_H__
-#define __TANUKIGB_CPU_INTERNAL_REGISTER_REGISTER_ARITHMETIC_OPERATORS_H__
+#ifndef __TANUKIGB_CPU_REGISTER_INTERNAL_REGISTER_ARITHMETIC_OPERATORS_H__
+#define __TANUKIGB_CPU_REGISTER_INTERNAL_REGISTER_ARITHMETIC_OPERATORS_H__
 
-#include <tanukigb/cpu/register/register_functionoid.h>
+#include <tanukigb/cpu/register/register_type_traits.h>
 
 #include <concepts>
 
 namespace tanukigb {
-
-template <std::integral T, RegisterFunctionoid<T> Functionoid>
-class Register;
 
 // All operators are non-friend, non-member as the private functionoid exposes
 // all it's own methods as methods of the register class.
@@ -23,143 +20,158 @@ class Register;
 // for the case theyre both registers, I could skip it for the non assignment
 // versions but ...
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
-inline T operator+(const Register<T, F>& lhs, U rhs) {
-  return ((lhs.operator T()) + rhs);
+template <std::integral T, RegisterType Register>
+constexpr inline register_value_type<Register> operator+(const Register& lhs,
+                                                         T rhs) {
+  return ((lhs.operator register_value_type<Register>()) + rhs);
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
-inline T operator+=(Register<T, F>& lhs, U rhs) {
+template <std::integral T, RegisterType Register>
+constexpr inline register_value_type<Register> operator+=(Register& lhs,
+                                                          T rhs) {
   return (lhs = operator+(lhs, rhs));
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
-inline T operator-(const Register<T, F>& lhs, U rhs) {
-  return (lhs.operator T() - rhs);
+template <std::integral T, RegisterType Register>
+constexpr inline register_value_type<Register> operator-(const Register& lhs,
+                                                         T rhs) {
+  return (lhs.operator register_value_type<Register>() - rhs);
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
-inline T operator-=(Register<T, F>& lhs, U rhs) {
+template <std::integral T, RegisterType Register>
+constexpr inline register_value_type<Register> operator-=(Register& lhs,
+                                                          T rhs) {
   return (lhs = operator-(lhs, rhs));
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
-inline T operator*(const Register<T, F>& lhs, U rhs) {
-  return (lhs.operator T() * rhs);
+template <std::integral T, RegisterType Register>
+constexpr inline register_value_type<Register> operator*(const Register& lhs,
+                                                         T rhs) {
+  return (lhs.operator register_value_type<Register>() * rhs);
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
-inline T operator*=(Register<T, F>& lhs, U rhs) {
+template <std::integral T, RegisterType Register>
+constexpr inline register_value_type<Register> operator*=(Register& lhs,
+                                                          T rhs) {
   return (lhs = operator*(lhs, rhs));
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
-inline T operator/(const Register<T, F>& lhs, U rhs) {
-  return (lhs.operator T() / rhs);
+template <std::integral T, RegisterType Register>
+constexpr inline register_value_type<Register> operator/(const Register& lhs,
+                                                         T rhs) {
+  return (lhs.operator register_value_type<Register>() / rhs);
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
-inline T operator/=(Register<T, F>& lhs, U rhs) {
+template <std::integral T, RegisterType Register>
+constexpr inline register_value_type<Register> operator/=(Register& lhs,
+                                                          T rhs) {
   return (lhs = operator/(lhs, rhs));
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
-inline T operator%(const Register<T, F>& lhs, U rhs) {
-  return (lhs.operator T() % rhs);
+template <std::integral T, RegisterType Register>
+constexpr inline register_value_type<Register> operator%(const Register& lhs,
+                                                         T rhs) {
+  return (lhs.operator register_value_type<Register>() % rhs);
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U>
-inline T operator%=(Register<T, F>& lhs, U rhs) {
+template <std::integral T, RegisterType Register>
+constexpr inline register_value_type<Register> operator%=(Register& lhs,
+                                                          T rhs) {
   return (lhs = operator%(lhs, rhs));
 }
 
 // Although it makes sence and is possible to return Register& here, for
-// symetry it returns T just as postfix does since postfix cannot return
-// Register&
+// symetry it returns register_value_type<Register> just as postfix does since
+// postfix cannot return Register&
 
-template <std::integral T, RegisterFunctionoid<T> F>
-inline T operator++(Register<T, F>& reg) {
+template <RegisterType Register>
+constexpr inline register_value_type<Register> operator++(Register& reg) {
   return operator+=(reg, 1);
 }
 
-template <std::integral T, RegisterFunctionoid<T> F>
-inline T operator++(Register<T, F>& reg, int) {
-  T old = reg.operator T();
+template <RegisterType Register>
+constexpr inline register_value_type<Register> operator++(Register& reg, int) {
+  auto old = reg.operator register_value_type<Register>();
   operator++(reg);
   return old;
 }
-template <std::integral T, RegisterFunctionoid<T> F>
-inline T operator--(Register<T, F>& reg) {
+template <RegisterType Register>
+constexpr inline register_value_type<Register> operator--(Register& reg) {
   return operator-=(reg, 1);
 }
 
-template <std::integral T, RegisterFunctionoid<T> F>
-inline T operator--(Register<T, F>& reg, int) {
-  T old = reg.operator T();
+template <RegisterType Register>
+constexpr inline register_value_type<Register> operator--(Register& reg, int) {
+  auto old = reg.operator register_value_type<Register>();
   operator--(reg);
   return old;
 }
 
-// Arimetic (Non Bitwise) operators where both are Registers (essentially the same/wrappers to
-// the above)
+// Arimetic (Non Bitwise) operators where both are Registers (essentially the
+// same/wrappers to the above)
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
-          RegisterFunctionoid<T> G>
-inline T operator+(const Register<T, F>& lhs, const Register<U, G>& rhs) {
-  return ((lhs.operator T()) + rhs.operator T());
+template <std::integral T, RegisterType Register, RegisterType OtherRegister>
+constexpr inline register_value_type<Register> operator+(
+    const Register& lhs, const OtherRegister& rhs) {
+  return ((lhs.operator register_value_type<Register>()) +
+          rhs.operator register_value_type<Register>());
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
-          RegisterFunctionoid<T> G>
-inline T operator+=(Register<T, F>& lhs, const Register<U, G>& rhs) {
+template <std::integral T, RegisterType Register, RegisterType OtherRegister>
+constexpr inline register_value_type<Register> operator+=(
+    Register& lhs, const OtherRegister& rhs) {
   return (lhs = operator+(lhs, rhs));
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
-          RegisterFunctionoid<T> G>
-inline T operator-(const Register<T, F>& lhs, const Register<U, G>& rhs) {
-  return (lhs.operator T() - rhs.operator T());
+template <std::integral T, RegisterType Register, RegisterType OtherRegister>
+constexpr inline register_value_type<Register> operator-(
+    const Register& lhs, const OtherRegister& rhs) {
+  return (lhs.operator register_value_type<Register>() -
+          rhs.operator register_value_type<Register>());
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
-          RegisterFunctionoid<T> G>
-inline T operator-=(Register<T, F>& lhs, const Register<U, G>& rhs) {
+template <std::integral T, RegisterType Register, RegisterType OtherRegister>
+constexpr inline register_value_type<Register> operator-=(
+    Register& lhs, const OtherRegister& rhs) {
   return (lhs = operator-(lhs, rhs));
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
-          RegisterFunctionoid<T> G>
-inline T operator*(const Register<T, F>& lhs, const Register<U, G>& rhs) {
-  return (lhs.operator T() * rhs.operator T());
+template <std::integral T, RegisterType Register, RegisterType OtherRegister>
+constexpr inline register_value_type<Register> operator*(
+    const Register& lhs, const OtherRegister& rhs) {
+  return (lhs.operator register_value_type<Register>() *
+          rhs.operator register_value_type<Register>());
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
-          RegisterFunctionoid<T> G>
-inline T operator*=(Register<T, F>& lhs, const Register<U, G>& rhs) {
+template <std::integral T, RegisterType Register, RegisterType OtherRegister>
+constexpr inline register_value_type<Register> operator*=(
+    Register& lhs, const OtherRegister& rhs) {
   return (lhs = operator*(lhs, rhs));
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
-          RegisterFunctionoid<T> G>
-inline T operator/(const Register<T, F>& lhs, const Register<U, G>& rhs) {
-  return (lhs.operator T() / rhs.operator T());
+template <std::integral T, RegisterType Register, RegisterType OtherRegister>
+constexpr inline register_value_type<Register> operator/(
+    const Register& lhs, const OtherRegister& rhs) {
+  return (lhs.operator register_value_type<Register>() /
+          rhs.operator register_value_type<Register>());
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
-          RegisterFunctionoid<T> G>
-inline T operator/=(Register<T, F>& lhs, const Register<U, G>& rhs) {
+template <std::integral T, RegisterType Register, RegisterType OtherRegister>
+constexpr inline register_value_type<Register> operator/=(
+    Register& lhs, const OtherRegister& rhs) {
   return (lhs = operator/(lhs, rhs));
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
-          RegisterFunctionoid<T> G>
-inline T operator%(const Register<T, F>& lhs, const Register<U, G>& rhs) {
-  return (lhs.operator T() % rhs.operator T());
+template <std::integral T, RegisterType Register, RegisterType OtherRegister>
+constexpr inline register_value_type<Register> operator%(
+    const Register& lhs, const OtherRegister& rhs) {
+  return (lhs.operator register_value_type<Register>() %
+          rhs.operator register_value_type<Register>());
 }
 
-template <std::integral T, RegisterFunctionoid<T> F, std::integral U,
-          RegisterFunctionoid<T> G>
-inline T operator%=(Register<T, F>& lhs, const Register<U, G>& rhs) {
+template <std::integral T, RegisterType Register, RegisterType OtherRegister>
+constexpr inline register_value_type<Register> operator%=(
+    Register& lhs, const OtherRegister& rhs) {
   return (lhs = operator%(lhs, rhs));
 }
 

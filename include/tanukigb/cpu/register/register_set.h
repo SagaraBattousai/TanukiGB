@@ -70,6 +70,7 @@ class RegisterSet {
   friend TANUKIGB_EXPORT std::ostream& operator<<(std::ostream& os,
                                                   const RegisterSet& obj) {
     os << "0x";
+    //std::operator<<(os, "0x");
     for (const unsigned char& b : obj.register_buffer_) {
       os << std::format("{:02x}", b);
     }

@@ -3,7 +3,7 @@
 
 #include <tanukigb/cpu/opcode_handler.h>
 #include <tanukigb/cpu/register/register.h>
-#include <tanukigb/cpu/register/register_type.h>
+#include <tanukigb/cpu/register/register_type_traits.h>
 #include <tanukigb/cpu/register_tags.h>
 #include <tanukigb/types/types.h>
 #include <tanukigb/utility/crtp.h>

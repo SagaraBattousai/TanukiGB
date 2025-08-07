@@ -1,9 +1,12 @@
 #ifndef __TANUKIGB_CPU_OPCODE_INTERNAL_OPCODE_16BIT_LOAD_H__
 #define __TANUKIGB_CPU_OPCODE_INTERNAL_OPCODE_16BIT_LOAD_H__
 
-#include <tanukigb/cpu/register_tags.h>
 #include <tanukigb/cpu/internal/opcode_handler_fwd_decls.h>
 #include <tanukigb/cpu/opcode_tags.h>
+#include <tanukigb/cpu/register_tags.h>
+
+//TODO: remove
+#include<tanukigb/cpu/register/register_ops.h>
 
 namespace tanukigb {
 
