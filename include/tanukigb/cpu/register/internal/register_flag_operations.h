@@ -27,19 +27,19 @@ constexpr inline bool IsFlagClear(const Register& reg) noexcept {
 }
 
 template <unsigned int... flags, RegisterType Register>
-constexpr inline register_value_type<Register> SetFlags(
+constexpr inline typename std::remove_reference_t<Register>::value_type SetFlags(
     Register& reg) noexcept {
   return reg |= (flags | ...);
 }
 
 template <unsigned int... flags, RegisterType Register>
-constexpr inline register_value_type<Register> ClearFlags(
+constexpr inline typename std::remove_reference_t<Register>::value_type ClearFlags(
     Register& reg) noexcept {
   return reg &= ~(flags | ...);
 }
 
 template <unsigned int... flags, RegisterType Register>
-constexpr inline register_value_type<Register> ToggleFlags(
+constexpr inline typename std::remove_reference_t<Register>::value_type ToggleFlags(
     Register& reg) noexcept {
   return reg ^= (flags | ...);
 }
@@ -59,21 +59,21 @@ constexpr inline bool IsFlagClear(const Register& reg) noexcept {
 
 template <enum_type enum_flag_t, enum_flag_t... enum_flags,
           RegisterType Register>
-constexpr inline register_value_type<Register> SetFlags(
+constexpr inline typename std::remove_reference_t<Register>::value_type SetFlags(
     Register& reg) noexcept {
   return reg |= (to_unsigned_underlying(enum_flags) | ...);
 }
 
 template <enum_type enum_flag_t, enum_flag_t... enum_flags,
           RegisterType Register>
-constexpr inline register_value_type<Register> ClearFlags(
+constexpr inline typename std::remove_reference_t<Register>::value_type ClearFlags(
     Register& reg) noexcept {
   return reg &= ~(to_unsigned_underlying(enum_flags) | ...);
 }
 
 template <enum_type enum_flag_t, enum_flag_t... enum_flags,
           RegisterType Register>
-constexpr inline register_value_type<Register> ToggleFlags(
+constexpr inline typename std::remove_reference_t<Register>::value_type ToggleFlags(
     Register& reg) noexcept {
   return reg ^= (to_unsigned_underlying(enum_flags) | ...);
 }

@@ -69,20 +69,16 @@ inline constexpr bool register_has_at_least_64_bits =
 // an object) but we dont care whether it is or not.
 
 template <typename R>
-concept RegisterType =
-    std::is_same_v<Register<word_t, RegisterSetFnoid<word_t>>,
-                   std::remove_cvref_t<R>>;
-// concept RegisterType = requires(
-//     R reg, typename std::remove_reference_t<R>::value_type vt) {
-//   std::is_integral_v<typename std::remove_reference_t<R>::value_type>;
-//   // requires an implicit (direct) conversion to value_type
-//   {
-//     reg.operator std::remove_reference_t<R>::value_type()
-//   } noexcept -> std::same_as<typename
-//   std::remove_reference_t<R>::value_type>;
-//
-//   { reg = vt } noexcept;
-// };
+concept RegisterType = requires(
+    R reg, typename std::remove_reference_t<R>::value_type vt) {
+  std::is_integral_v<typename std::remove_reference_t<R>::value_type>;
+  // requires an implicit (direct) conversion to value_type
+  {
+    reg.operator std::remove_reference_t<R>::value_type()
+  } noexcept -> std::same_as<typename std::remove_reference_t<R>::value_type>;
+
+  { reg = vt } noexcept;
+};
 
 }  // namespace tanukigb
 #endif
