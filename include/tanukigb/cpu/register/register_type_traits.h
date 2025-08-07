@@ -1,11 +1,6 @@
 #ifndef __TANUKIGB_CPU_REGISTER_REGISTER_TYPE_TRAITS_H__
 #define __TANUKIGB_CPU_REGISTER_REGISTER_TYPE_TRAITS_H__
 
-// TODO: Remove
-#include <tanukigb/cpu/register/register.h>
-#include <tanukigb/cpu/register/register_set.h>
-#include <tanukigb/types/types.h>
-
 #include <climits>
 #include <concepts>
 #include <type_traits>
@@ -15,13 +10,14 @@ namespace tanukigb {
 // Defined first as Concept (RegisterType) not required here thanks to SFINAE (I
 // think)
 
+//Cant get the value_type part working!!!!
 // Have to pass remove_reference_t or remove cv_ref_t to this, cant have it on
 // the inside....... Maybe not!! In fact im so confused and ChatGPT doesnt
 // either
 template <typename R>
 struct register_traits {
-  using value_type = typename std::remove_reference_t<R>::value_type;
-  // using value_type = typename R::value_type;
+  // using value_type = typename std::remove_reference_t<R>::value_type;
+  using value_type = typename R::value_type;
 
   static constexpr std::size_t bit_width = sizeof(value_type) * CHAR_BIT;
 
@@ -31,8 +27,8 @@ struct register_traits {
 
 // TODO rename to register_value_t (like iterator traits style)
 template <typename R>
-using register_value_type = typename register_traits<R>::value_type;
-// typename register_traits<std::remove_reference_t<R>>::value_type;
+// using register_value_type = typename register_traits<R>::value_type;
+using register_value_type = typename register_traits<std::remove_reference_t<R>>::value_type;
 
 // Additional helpers (by leaving out of struct it saves typing :)
 

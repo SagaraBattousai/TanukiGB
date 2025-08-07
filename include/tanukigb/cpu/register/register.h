@@ -2,7 +2,7 @@
 #define __TANUKIGB_CPU_REGISTER_REGISTER_H__
 
 #include <tanukigb/cpu/register/register_functionoid.h>
-//#include <tanukigb/cpu/register/register_ops.h>
+#include <tanukigb/cpu/register/register_ops.h>
 
 #include <utility>
 

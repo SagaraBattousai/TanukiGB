@@ -5,9 +5,6 @@
 #include <tanukigb/cpu/opcode_tags.h>
 #include <tanukigb/cpu/register_tags.h>
 
-//TODO: remove
-#include<tanukigb/cpu/register/register_ops.h>
-
 namespace tanukigb {
 
 template <typename Underlying>
