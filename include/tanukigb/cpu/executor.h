@@ -9,20 +9,34 @@
 #include <tanukigb/utility/crtp.h>
 
 #include <type_traits>
+#include <utility>
 
 namespace tanukigb {
 
+// Trying out noexcept operator (inside specifier)
 template <typename E>
 class Executor : public Crtp<E, Executor> {
+ public:
+  enum class RegisterFlags : byte_t {
+    Z = (1 << 7),
+    N = (1 << 6),
+    H = (1 << 5),
+    C = (1 << 4)
+  };
+
  protected:
   static constexpr const auto jump_table = GenerateJumpTable<Executor, 255>();
 
  public:
   Executor() = default;
 
-  // TODO: Trailing return? -> decltype(this->to_underlying().GetRegister<Tag>()) ?
+  // TODO: Trailing return? ->
+  // decltype(this->to_underlying().GetRegister<Tag>()) ?
+
+  // Static_assert checking call to same function in underlying
   template <RegisterTag Tag>
-  constexpr auto& GetRegister() {
+  constexpr auto& GetRegister() noexcept(
+      noexcept(std::declval<E>().GetRegister<Tag>())) {
     auto& reg = this->to_underlying().GetRegister<Tag>();
     static_assert(
         RegisterType<decltype(reg)>,
@@ -50,7 +64,8 @@ class Executor : public Crtp<E, Executor> {
   }
 
   template <RegisterTag Tag>
-  constexpr const auto& GetRegister() const {
+  constexpr const auto& GetRegister() const
+      noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
     const auto& reg = this->to_underlying().GetRegister<Tag>();
     static_assert(
         RegisterType<decltype(reg)>,
@@ -77,9 +92,34 @@ class Executor : public Crtp<E, Executor> {
     return reg;
   }
 
-  byte_t MemoryRead(word_t addr) const noexcept {
+  // byte_t MemoryRead(word_t addr) const
+  // noexcept(noexcept(this->to_underlying().MemoryRead(addr))) {
+  byte_t MemoryRead(word_t addr) const
+      noexcept(noexcept(std::declval<E>().MemoryRead(addr))) {
     return this->to_underlying().MemoryRead(addr);
   }
+
+ private:
+ /* constexpr inline bool IsZFlagSet() const
+      noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
+    return IsFlagSet<RegisterFlags, RegisterFlags::Z>(
+        GetRegister<register_tags::F>());
+  }
+  constexpr inline bool IsNFlagSet() const
+      noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
+    return IsFlagSet<RegisterFlags, RegisterFlags::N>(
+        GetRegister<register_tags::F>());
+  }
+  constexpr inline bool IsHFlagSet() const
+      noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
+    return IsFlagSet<RegisterFlags, RegisterFlags::H>(
+        GetRegister<register_tags::F>());
+  }
+  constexpr inline bool IsCFlagSet() const
+      noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
+    return IsFlagSet<RegisterFlags, RegisterFlags::C>(
+        GetRegister<register_tags::F>());
+  }*/
 };
 
 }  // namespace tanukigb

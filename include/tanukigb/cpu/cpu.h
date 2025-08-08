@@ -15,15 +15,16 @@ namespace tanukigb {
 
 class Cpu : public Executor<Cpu> {
  public:
-  static TANUKIGB_EXPORT Cpu GameboyCpu();
-  static TANUKIGB_EXPORT Cpu ColourGameboyCpu();
+  static TANUKIGB_EXPORT Cpu GameboyCpu() { return Cpu(MMU::GameboyMMU()); }
+
+  static TANUKIGB_EXPORT Cpu ColourGameboyCpu() {
+    return Cpu(MMU::ColourGameboyMMU());
+  }
 
   TANUKIGB_EXPORT ~Cpu() = default;
+
   Cpu(Cpu&&) = delete;
   Cpu& operator=(Cpu&&) = delete;
-
-  // The following copy functions (Constructor and operator=) are deleted
-  //  for now
   Cpu(const Cpu&) = delete;
   Cpu& operator=(const Cpu&) = delete;
 
@@ -37,7 +38,7 @@ class Cpu : public Executor<Cpu> {
     return tanukigb::PrettyPrintRegisters(os, registers_);
   }
 
-  TANUKIGB_EXPORT byte_t MemoryRead(word_t addr) const noexcept{
+  TANUKIGB_EXPORT byte_t MemoryRead(word_t addr) const noexcept {
     return mmu_.Read(addr);
   }
 
@@ -52,31 +53,7 @@ class Cpu : public Executor<Cpu> {
   }
 
  private:
-  enum class RegisterFlags : byte_t {
-    Z = (1 << 7),
-    N = (1 << 6),
-    H = (1 << 5),
-    C = (1 << 4)
-  };
-
   Cpu(MMU&& mmu) : mmu_{std::move(mmu)}, registers_{} {};
-
-  bool IsZFlagSet() const noexcept {
-    return IsFlagSet<RegisterFlags, RegisterFlags::Z>(
-        registers_.GetRegister<register_tags::F>());
-  }
-  bool IsNFlagSet() const noexcept {
-    return IsFlagSet<RegisterFlags, RegisterFlags::N>(
-        registers_.GetRegister<register_tags::F>());
-  }
-  bool IsHFlagSet() const noexcept {
-    return IsFlagSet<RegisterFlags, RegisterFlags::H>(
-        registers_.GetRegister<register_tags::F>());
-  }
-  bool IsCFlagSet() const noexcept {
-    return IsFlagSet<RegisterFlags, RegisterFlags::C>(
-        registers_.GetRegister<register_tags::F>());
-  }
 
   MMU mmu_;
   RegisterSet registers_;

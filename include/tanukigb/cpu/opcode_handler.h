@@ -6,7 +6,7 @@
 // its so awesome though).
 
 //#include <tanukigb/cpu/executor.h>
-#include <tanukigb/cpu/internal/opcode_handler_fwd_decls.h>
+#include <tanukigb/cpu/opcode_handler_fwd_decls.h>
 #include <tanukigb/cpu/opcode_tags.h>
 #include <tanukigb/types/types.h>
 
@@ -18,29 +18,6 @@
 #include <iostream>
 
 namespace tanukigb {
-
-template <typename E,
-          opcode_type Num_Ops = std::numeric_limits<opcode_type>::max()>
-using JumpTable =
-    std::array<OpcodeExecutionFunctionPtr<E>, std::size_t(Num_Ops)>;
-
-namespace opcode_details {
-
-//template <Executor E, opcode_type... Ops>
-template <typename E, opcode_type... Ops>
-constexpr JumpTable<E, sizeof...(Ops)> GenerateJumpTable(
-    std::integer_sequence<opcode_type, Ops...>) {
-  return {(&OpcodeHandler<Ops>::template execute<E>)...};
-}
-
-}  // namespace opcode_details
-
-//template <Executor E, opcode_type Num_Ops>
-template <typename E, opcode_type Num_Ops>
-constexpr auto GenerateJumpTable() {
-  return opcode_details::GenerateJumpTable<E>(
-      std::make_integer_sequence<opcode_type, Num_Ops>{});
-}
 
 template <typename Underlying, OpcodeTag Tag>
 struct OpcodeHandlerCRTPBase {};

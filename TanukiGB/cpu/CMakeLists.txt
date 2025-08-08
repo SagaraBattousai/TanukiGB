@@ -1,5 +1,7 @@
 set(cpu_MODULE_ROOT "${MODULE_ROOT}/TanukiGB/cpu")
 
+# set(CPU_ROOT_FOLDER_NAME "${ROOT_FOLDER_NAME}/libs/cpu_libs")
+
 set(cpp_sources "cpu.cpp")
 
 set(c_sources "")
@@ -8,10 +10,11 @@ set(cpu_module
     # TEMP
     "${cpu_MODULE_ROOT}/register_tags.h"
     "${cpu_MODULE_ROOT}/executor.h"
+    "${cpu_MODULE_ROOT}/jump_table.h"
+    "${cpu_MODULE_ROOT}/opcode_handler_fwd_decls.h"
     "${cpu_MODULE_ROOT}/opcode_handler.h" "${cpu_MODULE_ROOT}/opcode_tags.h")
 
 set(cpu_internal_opcode_module
-    "${cpu_MODULE_ROOT}/internal/opcode_handler_fwd_decls.h"
     "${cpu_MODULE_ROOT}/internal/8bit_load.h"
     "${cpu_MODULE_ROOT}/internal/16bit_load.h"
     "${cpu_MODULE_ROOT}/internal/8bit_arithmetic.h"

@@ -1,7 +1,7 @@
 #ifndef __TANUKIGB_CPU_OPCODE_INTERNAL_OPCODE_JUMP_H__
 #define __TANUKIGB_CPU_OPCODE_INTERNAL_OPCODE_JUMP_H__
 
-#include <tanukigb/cpu/internal/opcode_handler_fwd_decls.h>
+#include <tanukigb/cpu/opcode_handler_fwd_decls.h>
 #include <tanukigb/cpu/opcode_tags.h>
 
 namespace tanukigb {

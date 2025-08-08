@@ -45,26 +45,10 @@ static void RunGameBoy(tanukigb::Cpu& cpu) {
   }
 }
 
-//WHY DOES TYPE TRAIT STUFF WORK HERE!!!!!!!
-
-template<typename X>
-constexpr inline tanukigb::register_value_t<X> f(byte_t x) {
-  return x;
-}
-
 int main() {
   tanukigb::Cpu cpu = tanukigb::Cpu::GameboyCpu();
   RunGameBoy(cpu);
   cpu.PrettyPrintRegisters(std::cout);
-
-  tanukigb::RegisterSet rs{};
-
-  auto& A = rs.GetRegister<tanukigb::register_tags::A>();
-
-  
-  tanukigb::register_value_t<decltype(A)> x = 0xAB;
-
-  typename std::remove_reference_t<decltype(A)>::value_type ret = f<decltype(A)>(3);
 
   return 0;
 }
