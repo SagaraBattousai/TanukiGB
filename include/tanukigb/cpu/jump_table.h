@@ -7,6 +7,10 @@
 // Purely generic so it can be lifted to library (or sub module but I like
 // keeping dependancies one way to avoid cycles)
 
+//Some of the types are a bit overcomplicated! enforcinf the ::execute<T> is a bit tight, although just a name
+//does require more than just passing a function pointer type though :( 
+//
+
 namespace tanukigb {
 
 //Has to be std::size_t Num_Ops (in all other integer_sequences) as although we want 0 - (N-1) we have to specify N and N may not fit into the type (even though 0 - (N-1) will.
@@ -15,17 +19,6 @@ template <typename ReturnType, typename Reciever, std::size_t Num_Ops>
 using JumpTable = std::array<ReturnType (*)(Reciever), Num_Ops>;
 
 namespace jumptable_details {
-// Dont think I need any of this actually (FP Stuff) TODO: Remove on commit
-template <typename FP>
-struct is_function_pointer
-    : std::bool_constant<std::is_pointer_v<FP> &&
-                         std::is_function_v<std::remove_pointer_t<FP>>> {};
-
-template <typename FP>
-constexpr inline bool is_function_pointer_v = is_function_pointer<FP>::value;
-
-template <typename FP>
-concept FunctionPtr = is_function_pointer_v<FP>;
 
 // Required as OpcodeType has to come first so we cant do it for Concept wiout
 // specifying for every integral so... Reciever should be lvalue ref but I think
@@ -38,7 +31,8 @@ struct is_table_handler
           std::is_integral_v<OpcodeType> &&
           std::is_same_v<
               ReturnType,
-              std::invoke_result_t<&T<OpcodeType{}>::template execute<Reciever>,
+                         std::invoke_result_t<decltype(& T<OpcodeType{}>::
+                                                  template execute<Reciever>),
                                    Reciever>>> {};
 
 template <typename OpcodeType, template <OpcodeType> typename T,

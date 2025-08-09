@@ -2,22 +2,9 @@
 #define __TANUKIGB_CPU_OPCODE_HANDLER_FWD_DECLS_H__
 
 #include <tanukigb/cpu/opcode_tags.h>
-#include <tanukigb/cpu/jump_table.h>
 #include <tanukigb/types/types.h>
 
 namespace tanukigb {
-
-using opcode_return_type = int;
-using opcode_type = byte_t;
-
-// template <Executor E>
-//template <typename E>
-//using OpcodeExecutionFunctionPtr = opcode_return_type (*)(E&);
-
-//Want to say CRTP Executor but then wed have circulars (or forward decls)
-// template <Executor E, std::size_t Num_Ops>
-template <typename E, std::size_t Num_Ops>
-using OpcodeJumpTable = JumpTable<opcode_return_type, E, std::size_t Num_Ops>>;
 
 template <typename Underlying, OpcodeTag Tag>
 struct OpcodeHandlerCRTPBase;

@@ -1,7 +1,25 @@
 #ifndef __TANUKIGB_CPU_EXECUTOR_H__
 #define __TANUKIGB_CPU_EXECUTOR_H__
 
-#include <tanukigb/cpu/opcode_handler.h>
+// Byond having a JumpTable Executor should not know about, or care about
+// opcodes, it just but provide what it needs. That could be via a concept or it
+// could mean that opcode needs to know about the Executor (since the CRTP is
+// essentially a (compile time) interface (much like a concept))
+//
+// Unfortunatly opcode is better suited (semantically, certainly not
+// syntaxtically) to be decoupled than Executor.
+//
+// If there is an Executor Concept then we can constrain the opcodes but
+// actually Concepts are for symantics not syntax/type checking so I should
+// either use SFINAE (even though it says to prefer concepts) as the compiler
+// will still catch the type being incorrect but I like specifying the interface
+// so....
+//
+// Okay, Opcodes will know about the Executor but the Executor wont know about
+// opcodes other the function pointer type and the forward decl of the Opcode handler class
+//
+
+#include <tanukigb/cpu/jump_table.h>
 #include <tanukigb/cpu/register/register.h>
 #include <tanukigb/cpu/register/register_type_traits.h>
 #include <tanukigb/cpu/register_tags.h>
@@ -13,7 +31,24 @@
 
 namespace tanukigb {
 
-// Trying out noexcept operator (inside specifier)
+using opcode_return_type = int;
+using opcode_type = byte_t;
+
+// Forward Declare actual Handler
+template <opcode_type Opcode>
+struct OpcodeHandler;
+
+//Forward declared
+template <typename E>
+class Executor;// : public Crtp<E, Executor>;
+
+template <typename E>
+using OpcodeExecutionFunctionPtr = opcode_return_type (*)(Executor<E>&);
+
+//template <typename E, std::size_t Num_Ops>
+template <std::size_t Num_Ops>
+using OpcodeJumpTable = JumpTable<opcode_return_type, int&, std::size_t Num_Ops>;
+
 template <typename E>
 class Executor : public Crtp<E, Executor> {
  public:
@@ -23,9 +58,11 @@ class Executor : public Crtp<E, Executor> {
     H = (1 << 5),
     C = (1 << 4)
   };
-
+  //typename OpcodeType, template <OpcodeType> typename T,
+ typename ReturnType, typename Reciever,
+     std::size_t Num_Ops
  protected:
-  static constexpr const auto jump_table = GenerateJumpTable<Executor, 255>();
+  static constexpr const auto jump_table = GenerateJumpTable<opcode_type, , 256>();
 
  public:
   Executor() = default;
@@ -100,26 +137,26 @@ class Executor : public Crtp<E, Executor> {
   }
 
  private:
- /* constexpr inline bool IsZFlagSet() const
-      noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
-    return IsFlagSet<RegisterFlags, RegisterFlags::Z>(
-        GetRegister<register_tags::F>());
-  }
-  constexpr inline bool IsNFlagSet() const
-      noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
-    return IsFlagSet<RegisterFlags, RegisterFlags::N>(
-        GetRegister<register_tags::F>());
-  }
-  constexpr inline bool IsHFlagSet() const
-      noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
-    return IsFlagSet<RegisterFlags, RegisterFlags::H>(
-        GetRegister<register_tags::F>());
-  }
-  constexpr inline bool IsCFlagSet() const
-      noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
-    return IsFlagSet<RegisterFlags, RegisterFlags::C>(
-        GetRegister<register_tags::F>());
-  }*/
+  /* constexpr inline bool IsZFlagSet() const
+       noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
+     return IsFlagSet<RegisterFlags, RegisterFlags::Z>(
+         GetRegister<register_tags::F>());
+   }
+   constexpr inline bool IsNFlagSet() const
+       noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
+     return IsFlagSet<RegisterFlags, RegisterFlags::N>(
+         GetRegister<register_tags::F>());
+   }
+   constexpr inline bool IsHFlagSet() const
+       noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
+     return IsFlagSet<RegisterFlags, RegisterFlags::H>(
+         GetRegister<register_tags::F>());
+   }
+   constexpr inline bool IsCFlagSet() const
+       noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
+     return IsFlagSet<RegisterFlags, RegisterFlags::C>(
+         GetRegister<register_tags::F>());
+   }*/
 };
 
 }  // namespace tanukigb

@@ -1,10 +1,6 @@
 #ifndef __TANUKIGB_CPU_OPCODE_HANDLER_H__
 #define __TANUKIGB_CPU_OPCODE_HANDLER_H__
 
-// As This is an application and not a library I must remember that I can be
-// bespoky (I love this pattern but I dont have time to waste trying to do so,
-// its so awesome though).
-
 //#include <tanukigb/cpu/executor.h>
 #include <tanukigb/cpu/opcode_handler_fwd_decls.h>
 #include <tanukigb/cpu/opcode_tags.h>
