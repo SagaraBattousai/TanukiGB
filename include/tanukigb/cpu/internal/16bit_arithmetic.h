@@ -4,6 +4,12 @@
 #include <tanukigb/cpu/opcode_tags.h>
 #include <tanukigb/cpu/opcode_handler_fwd_decls.h>
 
+#define Arithmetic16OpcodeHandler(opcode) \
+  template <>                      \
+  struct OpcodeHandler<opcode>     \
+      : OpcodeHandlerCRTPBase<OpcodeHandler<opcode>, opcode_tags::Arithmetic16Bit>
+
+
 namespace tanukigb {
 
   template <typename Underlying>
@@ -18,4 +24,5 @@ namespace tanukigb {
   };
 }
 
+#undef Arithmetic16OpcodeHandler
 #endif

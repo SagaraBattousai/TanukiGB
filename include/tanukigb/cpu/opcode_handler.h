@@ -5,11 +5,19 @@
 #include <tanukigb/cpu/opcode_tags.h>
 #include <tanukigb/types/types.h>
 
+
+#include <tanukigb/cpu/internal/16bit_arithmetic.h>
+#include <tanukigb/cpu/internal/16bit_load.h>
+#include <tanukigb/cpu/internal/8bit_arithmetic.h>
+#include <tanukigb/cpu/internal/8bit_load.h>
+#include <tanukigb/cpu/internal/jump.h>
+#include <tanukigb/cpu/internal/rotate_and_shift.h>
+#include <tanukigb/cpu/internal/single_bit.h>
+
 namespace tanukigb {
 
 template <typename Underlying, OpcodeTag Tag>
 struct OpcodeHandlerCRTPBase {};
-
 
 template <byte_t Opcode>
 struct OpcodeHandler
@@ -21,14 +29,6 @@ struct OpcodeHandler
   }
 };
 }  // namespace tanukigb
-
-#include <tanukigb/cpu/internal/16bit_arithmetic.h>
-#include <tanukigb/cpu/internal/16bit_load.h>
-#include <tanukigb/cpu/internal/8bit_arithmetic.h>
-#include <tanukigb/cpu/internal/8bit_load.h>
-#include <tanukigb/cpu/internal/jump.h>
-#include <tanukigb/cpu/internal/rotate_and_shift.h>
-#include <tanukigb/cpu/internal/single_bit.h>
 
 // template <typename T, byte_t... IS>
 // constexpr std::array<OpcodeHandlerFuncPtr<T>, sizeof...(IS)> GenJumpTable()

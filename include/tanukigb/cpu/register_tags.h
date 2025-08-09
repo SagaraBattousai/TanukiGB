@@ -10,7 +10,6 @@ namespace tanukigb {
 
 namespace register_tags {
 namespace groups {
-// Unused hierachial tags
 struct Reg8Bit {};
 struct Reg16Bit {};
 struct RegComposite : Reg16Bit {};

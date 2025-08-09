@@ -4,6 +4,12 @@
 #include <tanukigb/cpu/opcode_tags.h>
 #include <tanukigb/cpu/opcode_handler_fwd_decls.h>
 
+// Undefed at end of file. Used to save typing but not for external visability
+#define Load8OpcodeHandler(opcode) \
+  template <>                       \
+  struct OpcodeHandler<opcode>      \
+      : OpcodeHandlerCRTPBase<OpcodeHandler<opcode>, opcode_tags::Load8Bit>
+
 
 namespace tanukigb {
 
@@ -19,4 +25,5 @@ namespace tanukigb {
   };
 }
 
+#undef Load8OpcodeHandler
 #endif

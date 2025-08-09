@@ -5,6 +5,12 @@
 #include <tanukigb/cpu/opcode_tags.h>
 #include <tanukigb/cpu/register_tags.h>
 
+// Undefed at end of file. Used to save typing but not for external visability
+#define Arithmetic8BitOpcodeHandler(opcode) \
+  template <>                       \
+  struct OpcodeHandler<opcode>      \
+      : OpcodeHandlerCRTPBase<OpcodeHandler<opcode>, opcode_tags::Arithmetic8Bit>
+
 namespace tanukigb {
 
 template <typename Underlying>
@@ -21,9 +27,7 @@ struct OpcodeHandlerCRTPBase<Underlying, opcode_tags::Arithmetic8Bit> {
   }
 };
 
-template <>
-struct OpcodeHandler<0xAF>
-    : Arithmetic8BitOpcodeHandlerBase<OpcodeHandler<0xAF>> {
+Arithmetic8BitOpcodeHandler(0xAF) {
   constexpr static const char* const Neumonic = "XOR A";
   constexpr static int InstructionBytes = 1;
   constexpr static int Cycles = 1;
@@ -51,5 +55,7 @@ struct OpcodeHandler<0xAF>
 };
 
 }  // namespace tanukigb
+
+#undef Arithmetic8BitOpcodeHandler
 
 #endif

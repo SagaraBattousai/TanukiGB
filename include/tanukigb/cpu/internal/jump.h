@@ -4,6 +4,12 @@
 #include <tanukigb/cpu/opcode_handler_fwd_decls.h>
 #include <tanukigb/cpu/opcode_tags.h>
 
+#define JumpOpcodeHandler(opcode) \
+  template <>                      \
+  struct OpcodeHandler<opcode>     \
+      : OpcodeHandlerCRTPBase<OpcodeHandler<opcode>, opcode_tags::Jump>
+
+
 namespace tanukigb {
 
 template <typename Underlying>
@@ -18,4 +24,5 @@ struct OpcodeHandlerCRTPBase<Underlying, opcode_tags::Jump> {
 };
 }  // namespace tanukigb
 
+#undef JumpOpcodeHandler
 #endif
