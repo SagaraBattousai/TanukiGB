@@ -1,5 +1,6 @@
 
 #include <tanukigb/cpu/cpu.h>
+#include <tanukigb/cpu/jump_table.h>
 #include <tanukigb/cpu/opcode_handler.h>
 #include <tanukigb/cpu/register/register.h>
 #include <tanukigb/cpu/register/register_set.h>
@@ -15,6 +16,8 @@
 #include <limits>
 #include <type_traits>
 #include <utility>
+
+#define ref_type(type) (std::is_rvalue_reference_v<type> ? "R Value" : (std::is_lvalue_reference_v<type> ? "L Value" : "Value"))
 
 using tanukigb::byte_t;
 using tanukigb::word_t;

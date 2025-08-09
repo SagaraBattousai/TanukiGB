@@ -2,6 +2,7 @@ set(utility_MODULE_ROOT "${MODULE_ROOT}/TanukiGB/utility")
 
 set(header_files 
     "${utility_MODULE_ROOT}/concepts.h"
+    "${utility_MODULE_ROOT}/type_traits.h"
     "${utility_MODULE_ROOT}/endianness.h"
     "${utility_MODULE_ROOT}/enum_utils.h"
     "${utility_MODULE_ROOT}/enum_flag_utils.h"

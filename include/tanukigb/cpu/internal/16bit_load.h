@@ -34,13 +34,13 @@ struct OpcodeHandler<0x21> : Load16BitOpcodeHandlerBase<OpcodeHandler<0x21>> {
 
   template <typename E>
   static inline opcode_return_type do_16bit_load(E& exe) {
-    auto& sp = exe.template GetRegister<register_tags::SP>();
-    auto& pc = exe.template GetRegister<register_tags::PC>();
+    //auto& sp = exe.template GetRegister<register_tags::SP>();
+    //auto& pc = exe.template GetRegister<register_tags::PC>();
 
     // Todo: after MMU add helper as the postfix++ is mucky.
-    sp = exe.MemoryRead(pc++) | exe.MemoryRead(pc++) << 8;
+    //sp = exe.MemoryRead(pc++) | exe.MemoryRead(pc++) << 8;
     // registers_.PC() += 2;
-    return 0;
+    return 0x21;
   }
 };
 

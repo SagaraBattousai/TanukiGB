@@ -16,7 +16,8 @@
 // so....
 //
 // Okay, Opcodes will know about the Executor but the Executor wont know about
-// opcodes other the function pointer type and the forward decl of the Opcode handler class
+// opcodes other the function pointer type and the forward decl of the Opcode
+// handler class
 //
 
 #include <tanukigb/cpu/jump_table.h>
@@ -38,17 +39,6 @@ using opcode_type = byte_t;
 template <opcode_type Opcode>
 struct OpcodeHandler;
 
-//Forward declared
-template <typename E>
-class Executor;// : public Crtp<E, Executor>;
-
-template <typename E>
-using OpcodeExecutionFunctionPtr = opcode_return_type (*)(Executor<E>&);
-
-//template <typename E, std::size_t Num_Ops>
-template <std::size_t Num_Ops>
-using OpcodeJumpTable = JumpTable<opcode_return_type, int&, std::size_t Num_Ops>;
-
 template <typename E>
 class Executor : public Crtp<E, Executor> {
  public:
@@ -58,14 +48,10 @@ class Executor : public Crtp<E, Executor> {
     H = (1 << 5),
     C = (1 << 4)
   };
-  //typename OpcodeType, template <OpcodeType> typename T,
- typename ReturnType, typename Reciever,
-     std::size_t Num_Ops
- protected:
-  static constexpr const auto jump_table = GenerateJumpTable<opcode_type, , 256>();
 
- public:
   Executor() = default;
+
+  int Run();
 
   // TODO: Trailing return? ->
   // decltype(this->to_underlying().GetRegister<Tag>()) ?
@@ -136,7 +122,6 @@ class Executor : public Crtp<E, Executor> {
     return this->to_underlying().MemoryRead(addr);
   }
 
- private:
   /* constexpr inline bool IsZFlagSet() const
        noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
      return IsFlagSet<RegisterFlags, RegisterFlags::Z>(
@@ -157,7 +142,25 @@ class Executor : public Crtp<E, Executor> {
      return IsFlagSet<RegisterFlags, RegisterFlags::C>(
          GetRegister<register_tags::F>());
    }*/
+ private:
+  static constexpr const auto jump_table =
+      GenerateJumpTable<opcode_type, OpcodeHandler, opcode_return_type,
+                        Executor, 256>();
 };
+
+template <typename E>
+int Executor<E>::Run() {
+  int retcode = 0;
+  byte_t opcode;
+
+  auto& PC = GetRegister<register_tags::PC>();
+  while (retcode == 0) {
+    opcode = MemoryRead(PC);
+    PC++;
+    retcode = jump_table[opcode](std::forward<decltype(*this)>(*this));
+  }
+  return retcode;
+}
 
 }  // namespace tanukigb
 

@@ -28,7 +28,7 @@ class Cpu : public Executor<Cpu> {
   Cpu(const Cpu&) = delete;
   Cpu& operator=(const Cpu&) = delete;
 
-  TANUKIGB_EXPORT int Run();
+  //TANUKIGB_EXPORT int Run();
 
   TANUKIGB_EXPORT std::ostream& PrintRegisters(std::ostream& os) const {
     return (os << registers_ << std::endl);

@@ -40,8 +40,11 @@ struct OpcodeHandler<0xAF>
 
     SetFlags<typename E::RegisterFlags, E::RegisterFlags::Z>(F);
 
-    // While clearing all flags before setting the one above achieves a similar result, it is technically wrong as it would destroy the lower (unused) bits.
-    ClearFlags<typename E::RegisterFlags, E::RegisterFlags::N, E::RegisterFlags::H, E::RegisterFlags::C>(F);
+    // While clearing all flags before setting the one above achieves a similar
+    // result, it is technically wrong as it would destroy the lower (unused)
+    // bits.
+    ClearFlags<typename E::RegisterFlags, E::RegisterFlags::N,
+               E::RegisterFlags::H, E::RegisterFlags::C>(F);
 
     return 0;
   }

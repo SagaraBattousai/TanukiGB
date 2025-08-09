@@ -1,17 +1,9 @@
 #ifndef __TANUKIGB_CPU_OPCODE_HANDLER_H__
 #define __TANUKIGB_CPU_OPCODE_HANDLER_H__
 
-//#include <tanukigb/cpu/executor.h>
 #include <tanukigb/cpu/opcode_handler_fwd_decls.h>
 #include <tanukigb/cpu/opcode_tags.h>
 #include <tanukigb/types/types.h>
-
-#include <array>
-#include <limits>
-#include <utility>
-
-// TODO: Remove iostream
-#include <iostream>
 
 namespace tanukigb {
 

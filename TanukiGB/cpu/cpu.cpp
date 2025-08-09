@@ -11,6 +11,7 @@
 
 namespace tanukigb {
 
+/*
 int Cpu::Run() {
   int retcode = 0;
   byte_t opcode;
@@ -23,4 +24,5 @@ int Cpu::Run() {
   }
   return retcode;
 }
+*/
 }  // namespace tanukigb
