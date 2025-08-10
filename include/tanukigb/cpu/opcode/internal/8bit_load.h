@@ -5,16 +5,16 @@
 #include <tanukigb/cpu/opcode/opcode_tags.h>
 
 // Undefed at end of file. Used to save typing but not for external visability
-#define Load8OpcodeHandler(opcode) \
-  template <>                      \
-  struct OpcodeHandler<opcode>     \
-      : OpcodeHandlerCRTPBase<OpcodeHandler<opcode>, opcode_tags::Load8Bit>
+#define Load8OpcodeHandler(opcode)                             \
+  template <OpcodeExecutor Executor>                           \
+  struct OpcodeHandler<Executor, opcode>                       \
+      : OpcodeHandlerCRTPBase<OpcodeHandler<Executor, opcode>, Executor, \
+                              opcode_tags::Load8Bit>
 
 namespace tanukigb {
 
-template <typename Derived>
-struct OpcodeHandlerCRTPBase<Derived, opcode_tags::Load8Bit> {
-  template <OpcodeExecutor Executor>
+template <typename Derived, OpcodeExecutor Executor>
+struct OpcodeHandlerCRTPBase<Derived, Executor, opcode_tags::Load8Bit> {
   static inline opcode_return_type execute(Executor& exe) {
     // TODO: Do stuff
     // TODO: set up what 8bit loads should return

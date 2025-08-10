@@ -6,11 +6,11 @@
 
 namespace tanukigb {
 
- template <typename Derived, OpcodeTag Tag>
+ template <typename Derived, OpcodeExecutor Executor, OpcodeTag Tag>
  struct OpcodeHandlerCRTPBase;
 
 // Forward Declare actual Handler
- template <opcode_type Opcode>
+ template <OpcodeExecutor Executor, opcode_type Opcode>
  struct OpcodeHandler;
 
 }  // namespace tanukigb

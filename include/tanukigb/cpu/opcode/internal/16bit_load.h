@@ -6,10 +6,11 @@
 #include <tanukigb/cpu/register_tags.h>  //TODO
 
 // Undefed at end of file. Used to save typing but not for external visability
-#define Load16OpcodeHandler(opcode) \
-  template <>                       \
-  struct OpcodeHandler<opcode>      \
-      : OpcodeHandlerCRTPBase<OpcodeHandler<opcode>, opcode_tags::Load16Bit>
+#define Load16OpcodeHandler(opcode)                            \
+  template <OpcodeExecutor Executor>                           \
+  struct OpcodeHandler<Executor, opcode>                       \
+      : OpcodeHandlerCRTPBase<OpcodeHandler<Executor, opcode>, Executor, \
+                              opcode_tags::Load16Bit>
 
 namespace tanukigb {
 
@@ -22,9 +23,8 @@ namespace load16_tags {
 struct load_immidiate {};
 }  // namespace load16_tags
 
-template <typename Derived>
-struct OpcodeHandlerCRTPBase<Derived, opcode_tags::Load16Bit> {
-  template <OpcodeExecutor Executor>
+template <typename Derived, OpcodeExecutor Executor>
+struct OpcodeHandlerCRTPBase<Derived, Executor, opcode_tags::Load16Bit> {
   static inline opcode_return_type execute(Executor& exe) {
     // TODO: Do stuff
 
@@ -39,7 +39,6 @@ struct OpcodeHandlerCRTPBase<Derived, opcode_tags::Load16Bit> {
   }
 
  private:
-  template <OpcodeExecutor Executor>
   constexpr static inline opcode_return_type do_16bit_load(
       Executor& exe, load16_tags::load_immidiate) {
     auto& load_reg =

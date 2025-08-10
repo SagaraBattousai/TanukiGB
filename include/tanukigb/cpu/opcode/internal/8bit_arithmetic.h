@@ -6,17 +6,16 @@
 #include <tanukigb/cpu/register_tags.h>  //TODO:
 
 // Undefed at end of file. Used to save typing but not for external visability
-#define Arithmetic8BitOpcodeHandler(opcode)          \
-  template <>                                        \
-  struct OpcodeHandler<opcode>                       \
-      : OpcodeHandlerCRTPBase<OpcodeHandler<opcode>, \
+#define Arithmetic8BitOpcodeHandler(opcode)                    \
+  template <OpcodeExecutor Executor>                           \
+  struct OpcodeHandler<Executor, opcode>                       \
+      : OpcodeHandlerCRTPBase<OpcodeHandler<Executor, opcode>, Executor, \
                               opcode_tags::Arithmetic8Bit>
 
 namespace tanukigb {
 
-template <typename Derived>
-struct OpcodeHandlerCRTPBase<Derived, opcode_tags::Arithmetic8Bit> {
-  template <OpcodeExecutor Executor>
+template <typename Derived, OpcodeExecutor Executor>
+struct OpcodeHandlerCRTPBase<Derived, Executor, opcode_tags::Arithmetic8Bit> {
   static inline opcode_return_type execute(Executor& exe) {
     int ret;
     // TODO: Do stuff
@@ -34,7 +33,6 @@ Arithmetic8BitOpcodeHandler(0xAF) {
   constexpr static int Cycles = 1;
   constexpr static const char* const Flags = "Z 0 0 0";
 
-  template <OpcodeExecutor Executor>
   static inline opcode_return_type do_8bit_arithmetic(Executor & exe) {
     auto& A = exe.template GetRegister<register_tags::A>();
     auto& F = exe.template GetRegister<register_tags::F>();

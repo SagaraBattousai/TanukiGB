@@ -15,14 +15,12 @@
 
 namespace tanukigb {
 
-template <typename Derived, OpcodeTag Tag>
+template <typename Derived, OpcodeExecutor Executor, OpcodeTag Tag>
 struct OpcodeHandlerCRTPBase {};
 
-template <opcode_type Opcode>
+template <OpcodeExecutor Executor, opcode_type Opcode>
 struct OpcodeHandler
-    : OpcodeHandlerCRTPBase<OpcodeHandler<Opcode>, opcode_tags::Other> {
-
-  template<typename Executor>
+    : OpcodeHandlerCRTPBase<OpcodeHandler<Executor, Opcode>, Executor, opcode_tags::Other> {
   static inline opcode_return_type execute(Executor& e) {
     // TODO
     return Opcode;

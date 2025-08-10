@@ -4,17 +4,16 @@
 #include <tanukigb/cpu/opcode/opcode_handler_fwd_decls.h>
 #include <tanukigb/cpu/opcode/opcode_tags.h>
 
-#define Arithmetic16OpcodeHandler(opcode)            \
-  template <>                                        \
-  struct OpcodeHandler<opcode>                       \
-      : OpcodeHandlerCRTPBase<OpcodeHandler<opcode>, \
+#define Arithmetic16OpcodeHandler(opcode)                      \
+  template <OpcodeExecutor Executor>                           \
+  struct OpcodeHandler<Executor, opcode>                       \
+      : OpcodeHandlerCRTPBase<OpcodeHandler<Executor, opcode>, Executor, \
                               opcode_tags::Arithmetic16Bit>
 
 namespace tanukigb {
 
-template <typename Derived>
-struct OpcodeHandlerCRTPBase<Derived, opcode_tags::Arithmetic16Bit> {
-  template <OpcodeExecutor Executor>
+template <typename Derived, OpcodeExecutor Executor>
+struct OpcodeHandlerCRTPBase<Derived, Executor, opcode_tags::Arithmetic16Bit> {
   static inline opcode_return_type execute(Executor& exe) {
     // TODO: Do stuff
     // TODO: set up what 8bit loads should return

@@ -14,32 +14,32 @@ using JumpTable = std::array<ReturnType (*)(Reciever&), Num_Ops>;
 
 namespace jumptable_details {
 
-/*
-Unfortunatly cannot be used as a replacement for typename as JumpSwitchType must
-come first so it needs to be in the requires clause
-*/
-template <typename JumpSwitchType, template <JumpSwitchType> typename Handler,
+template <typename JumpSwitchType,
+          template <typename, JumpSwitchType> typename Handler,
           typename ReturnType, typename Reciever>
 concept OpcodeHandler =
-    std::is_integral_v<JumpSwitchType> &&  requires(Reciever& arg) {
+    std::is_integral_v<JumpSwitchType> && requires(Reciever& arg) {
       {
-        Handler<static_cast<JumpSwitchType>(0)>::template execute<Reciever>(arg)
+        Handler<Reciever, static_cast<JumpSwitchType>(0)>::execute(arg)
       } -> std::same_as<ReturnType>;
     };
 
-template <typename JumpSwitchType, template <JumpSwitchType> typename Handler,
+template <typename JumpSwitchType,
+          template <typename, JumpSwitchType> typename Handler,
           typename ReturnType, typename Reciever, std::size_t... Ops>
-  //requires OpcodeHandler<JumpSwitchType, Handler, ReturnType, Reciever>
+  requires OpcodeHandler<JumpSwitchType, Handler, ReturnType, Reciever>
 constexpr JumpTable<ReturnType, Reciever, sizeof...(Ops)> GenerateJumpTable(
     std::index_sequence<Ops...>) {
-  return {(&Handler<Ops>::template execute<Reciever>)...};
+  return {(&Handler<Reciever, Ops>::execute)...};
 }
+
 }  // namespace jumptable_details
 
-template <typename JumpSwitchType, template <JumpSwitchType> typename Handler,
+template <typename JumpSwitchType,
+          template <typename, JumpSwitchType> typename Handler,
           typename ReturnType, typename Reciever, std::size_t Num_Ops>
-  //requires jumptable_details::OpcodeHandler<JumpSwitchType, Handler, ReturnType,
-  //                                          Reciever>
+  requires jumptable_details::OpcodeHandler<JumpSwitchType, Handler, ReturnType,
+                                            Reciever>
 constexpr auto GenerateJumpTable() {
   return jumptable_details::GenerateJumpTable<JumpSwitchType, Handler,
                                               ReturnType, Reciever>(
