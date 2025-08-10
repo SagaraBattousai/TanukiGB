@@ -1,7 +1,7 @@
 
 #include <tanukigb/cpu/cpu.h>
 #include <tanukigb/cpu/jump_table.h>
-#include <tanukigb/cpu/opcode_handler.h>
+#include <tanukigb/cpu/opcode/opcode_handler.h>
 #include <tanukigb/cpu/register/register.h>
 #include <tanukigb/cpu/register/register_set.h>
 #include <tanukigb/cpu/register/register_type_traits.h>

@@ -1,5 +1,4 @@
 #include <tanukigb/cpu/cpu.h>
-#include <tanukigb/cpu/opcode_handler.h>
 #include <tanukigb/cpu/register/register_set.h>
 #include <tanukigb/memory/mmu.h>
 #include <tanukigb/types/types.h>

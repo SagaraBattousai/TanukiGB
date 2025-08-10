@@ -21,7 +21,7 @@ come first so it needs to be in the requires clause
 template <typename JumpSwitchType, template <JumpSwitchType> typename Handler,
           typename ReturnType, typename Reciever>
 concept OpcodeHandler =
-    std::is_integral_v<JumpSwitchType> && requires(Reciever& arg) {
+    std::is_integral_v<JumpSwitchType> &&  requires(Reciever& arg) {
       {
         Handler<static_cast<JumpSwitchType>(0)>::template execute<Reciever>(arg)
       } -> std::same_as<ReturnType>;
@@ -29,7 +29,7 @@ concept OpcodeHandler =
 
 template <typename JumpSwitchType, template <JumpSwitchType> typename Handler,
           typename ReturnType, typename Reciever, std::size_t... Ops>
-  requires OpcodeHandler<JumpSwitchType, Handler, ReturnType, Reciever>
+  //requires OpcodeHandler<JumpSwitchType, Handler, ReturnType, Reciever>
 constexpr JumpTable<ReturnType, Reciever, sizeof...(Ops)> GenerateJumpTable(
     std::index_sequence<Ops...>) {
   return {(&Handler<Ops>::template execute<Reciever>)...};
@@ -38,8 +38,8 @@ constexpr JumpTable<ReturnType, Reciever, sizeof...(Ops)> GenerateJumpTable(
 
 template <typename JumpSwitchType, template <JumpSwitchType> typename Handler,
           typename ReturnType, typename Reciever, std::size_t Num_Ops>
-  requires jumptable_details::OpcodeHandler<JumpSwitchType, Handler, ReturnType,
-                                            Reciever>
+  //requires jumptable_details::OpcodeHandler<JumpSwitchType, Handler, ReturnType,
+  //                                          Reciever>
 constexpr auto GenerateJumpTable() {
   return jumptable_details::GenerateJumpTable<JumpSwitchType, Handler,
                                               ReturnType, Reciever>(

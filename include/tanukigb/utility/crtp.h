@@ -5,22 +5,32 @@
 
 namespace tanukigb {
 
-template<typename Underlying, template <typename> typename CRTP_T>
+template<typename Derived, template <typename> typename CRTP_T>
 class Crtp {
  public:
-  using underlying_type = Underlying;
+  using derived_type = Derived;
 
-  underlying_type& to_underlying() noexcept {
-    return static_cast<underlying_type&>(*this);
+  derived_type& as_derived() noexcept {
+    return static_cast<derived_type&>(*this);
   }
 
-  const underlying_type& to_underlying() const noexcept {
-    return static_cast<const underlying_type&>(*this);
+  const derived_type& as_derived() const noexcept {
+    return static_cast<const derived_type&>(*this);
   }
 
  private:
   Crtp() = default;
-  friend CRTP_T<Underlying>;
+  friend CRTP_T<Derived>;
+};
+
+template <typename Derived, template <typename> typename CRTP_T>
+class StaticCrtp {
+ public:
+  using derived_type = Derived;
+
+ private:
+  StaticCrtp() = default;
+  friend CRTP_T<Derived>;
 };
 
 }  // namespace tanukigb

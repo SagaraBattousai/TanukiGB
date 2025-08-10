@@ -1,24 +1,25 @@
-
-# TODO: If deemed neccisary
-
 set(opcode_MODULE_ROOT "${MODULE_ROOT}/TanukiGB/cpu/opcode")
 
 set(cpp_sources "")
 set(c_sources "")
 
 set(opcode_module
-    "${opcode_MODULE_ROOT}/opcode.h"
-    "${opcode_MODULE_ROOT}/opcode_ops.h"
+    "${opcode_MODULE_ROOT}/opcode_handler_fwd_decls.h"
+    "${opcode_MODULE_ROOT}/opcode_handler.h"
+    "${opcode_MODULE_ROOT}/opcode_tags.h"
+    #TODO
     "${opcode_MODULE_ROOT}/opcode_type_traits.h"
-    "${opcode_MODULE_ROOT}/opcode_functionoid.h"
-    "${opcode_MODULE_ROOT}/opcode_set.h"
-    "${opcode_MODULE_ROOT}/opcode_set_functionoid.h")
+    )
 
-set(opcode_internal_opcode_module
-    "${opcode_MODULE_ROOT}/internal/opcode_flag_operations.h"
-    "${opcode_MODULE_ROOT}/internal/opcode_arithmetic_operators.h"
-    "${opcode_MODULE_ROOT}/internal/opcode_bitwise_operators.h"
-    "${opcode_MODULE_ROOT}/internal/opcode_comparison_operators.h")
+set(opcode_internal_module
+    "${opcode_MODULE_ROOT}/internal/8bit_load.h"
+    "${opcode_MODULE_ROOT}/internal/16bit_load.h"
+    "${opcode_MODULE_ROOT}/internal/8bit_arithmetic.h"
+    "${opcode_MODULE_ROOT}/internal/16bit_arithmetic.h"
+    "${opcode_MODULE_ROOT}/internal/rotate_and_shift.h"
+    "${opcode_MODULE_ROOT}/internal/jump.h"
+    "${opcode_MODULE_ROOT}/internal/single_bit.h"
+    )
 
 add_library(opcode OBJECT ${cpp_sources} ${c_sources})
 
@@ -32,8 +33,10 @@ target_sources(
          ${MODULE_ROOT}
          FILES
          ${opcode_module}
-         ${opcode_internal_opcode_module}
+         ${opcode_internal_module}
          "${MODULE_ROOT}/_TanukiGB_config.h")
+
+set_target_properties(opcode PROPERTIES LINKER_LANGUAGE CXX)
 
 target_link_libraries(opcode types utility)
 

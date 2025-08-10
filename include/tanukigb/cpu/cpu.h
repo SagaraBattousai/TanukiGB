@@ -3,7 +3,6 @@
 
 #include <_TanukiGB_config.h>
 #include <tanukigb/cpu/executor.h>
-#include <tanukigb/cpu/opcode_handler.h>
 #include <tanukigb/cpu/register/register.h>
 #include <tanukigb/cpu/register/register_set.h>
 #include <tanukigb/memory/mmu.h>

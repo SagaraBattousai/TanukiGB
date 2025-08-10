@@ -1,23 +1,8 @@
 #ifndef __TANUKIGB_CPU_EXECUTOR_H__
 #define __TANUKIGB_CPU_EXECUTOR_H__
 
-// Byond having a JumpTable Executor should not know about, or care about
-// opcodes, it just but provide what it needs. That could be via a concept or it
-// could mean that opcode needs to know about the Executor (since the CRTP is
-// essentially a (compile time) interface (much like a concept))
-//
-// Unfortunatly opcode is better suited (semantically, certainly not
-// syntaxtically) to be decoupled than Executor.
-//
-// If there is an Executor Concept then we can constrain the opcodes but
-// actually Concepts are for symantics not syntax/type checking so I should
-// either use SFINAE (even though it says to prefer concepts) as the compiler
-// will still catch the type being incorrect but I like specifying the interface
-// so....
-//
-// Okay, Opcodes will know about the Executor but the Executor wont know about
-// opcodes other the function pointer type and the forward decl of the Opcode
-// handler class
+// Okay we'll go the otherway and force Executor to know about Opcodes but
+// opcodes only need to know about a conceptual executor.
 //
 
 #include <tanukigb/cpu/jump_table.h>
@@ -27,20 +12,15 @@
 #include <tanukigb/types/types.h>
 #include <tanukigb/utility/crtp.h>
 
+#include <tanukigb/cpu/opcode/opcode_handler.h>
+
 #include <type_traits>
 #include <utility>
 
 namespace tanukigb {
 
-using opcode_return_type = int;
-using opcode_type = byte_t;
-
-// Forward Declare actual Handler
-template <opcode_type Opcode>
-struct OpcodeHandler;
-
-template <typename E>
-class Executor : public Crtp<E, Executor> {
+template <typename Derived>
+class Executor : public Crtp<Derived, Executor> {
  public:
   enum class RegisterFlags : byte_t {
     Z = (1 << 7),
@@ -54,13 +34,13 @@ class Executor : public Crtp<E, Executor> {
   int Run();
 
   // TODO: Trailing return? ->
-  // decltype(this->to_underlying().GetRegister<Tag>()) ?
+  // decltype(this->as_derived().GetRegister<Tag>()) ?
 
   // Static_assert checking call to same function in underlying
   template <RegisterTag Tag>
   constexpr auto& GetRegister() noexcept(
-      noexcept(std::declval<E>().GetRegister<Tag>())) {
-    auto& reg = this->to_underlying().GetRegister<Tag>();
+      noexcept(std::declval<Derived>().GetRegister<Tag>())) {
+    auto& reg = this->as_derived().GetRegister<Tag>();
     static_assert(
         RegisterType<decltype(reg)>,
         "GetRegister must return a type with constraint RegisterType");
@@ -88,8 +68,8 @@ class Executor : public Crtp<E, Executor> {
 
   template <RegisterTag Tag>
   constexpr const auto& GetRegister() const
-      noexcept(noexcept(std::declval<E>().GetRegister<Tag>())) {
-    const auto& reg = this->to_underlying().GetRegister<Tag>();
+      noexcept(noexcept(std::declval<Derived>().GetRegister<Tag>())) {
+    const auto& reg = this->as_derived().GetRegister<Tag>();
     static_assert(
         RegisterType<decltype(reg)>,
         "GetRegister must return a type with constraint RegisterType");
@@ -116,10 +96,10 @@ class Executor : public Crtp<E, Executor> {
   }
 
   // byte_t MemoryRead(word_t addr) const
-  // noexcept(noexcept(this->to_underlying().MemoryRead(addr))) {
+  // noexcept(noexcept(this->as_derived().MemoryRead(addr))) {
   byte_t MemoryRead(word_t addr) const
-      noexcept(noexcept(std::declval<E>().MemoryRead(addr))) {
-    return this->to_underlying().MemoryRead(addr);
+      noexcept(noexcept(std::declval<Derived>().MemoryRead(addr))) {
+    return this->as_derived().MemoryRead(addr);
   }
 
   /* constexpr inline bool IsZFlagSet() const
@@ -157,7 +137,7 @@ int Executor<E>::Run() {
   while (retcode == 0) {
     opcode = MemoryRead(PC);
     PC++;
-    retcode = jump_table[opcode](std::forward<decltype(*this)>(*this));
+    retcode = jump_table[opcode](*this);
   }
   return retcode;
 }
